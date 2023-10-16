@@ -1,0 +1,3 @@
+Crop, Animal, and Item art for FF game
+_Crop_Name				Seed					Sprout					Grown
+Turnip
