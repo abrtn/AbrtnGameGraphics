@@ -40,12 +40,12 @@ class Plot:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.width = 0
-        self.height = 0
-        self.image = "PLOT_IMAGE"
-        self.cropNum = 0
-        self.cropStart = (self.width - 10, self.height - 10)
-        self.step = 30
+        self.width = 250
+        self.height = 250
+        self.image = "Art/Plot.png"
+        self.crops = []
+        self.cropStart = (self.x + 35, self.y + 30)
+        self.step = 35
         plot = pygame.image.load(self.image)
         plot = pygame.transform.scale(plot, (self.width,self.height))
         self.plot = plot
@@ -64,9 +64,9 @@ class Crop:
     def __init__(self, name):
         self.name = name
         self.width = 20
-        self.width = 20
+        self.height = 20
         self.images = func.getImage(name)
-        self.imageIndex = 1
+        self.imageIndex = 0
         crop = pygame.image.load(self.images[1])
         crop = pygame.transform.scale(crop, (self.width,self.height))
         self.crop = crop
@@ -74,18 +74,20 @@ class Crop:
         
     def plant(self, window, plot: Plot):
         #TODO call c++ plant
-        if(plot.cropNum > 25):
+        if(len(plot.crops) >= 25):
             return
         if(not self.loc):
             self.loc = plot.cropStart
-            plot.cropNum += 1
+            plot.crops.append(self)
+            #TODO get multiple crops
+        plot.draw(window)
         window.blit(self.crop, self.loc)
         pygame.display.update()
         
     def grow(self, window, plot: Plot):
         #TODO called in c++ new day
         self.imageIndex += 1
-        self.imageIndex %= len(self.images)
+        self.imageIndex %= len(self.images) - 1
         crop = pygame.image.load(self.images[self.imageIndex + 1])
         crop = pygame.transform.scale(crop, (self.width,self.height))
         self.crop = crop

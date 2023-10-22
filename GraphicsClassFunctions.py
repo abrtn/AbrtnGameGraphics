@@ -4,7 +4,7 @@ def getImage(name: str):
     f = open("refArt.txt", 'r')
     artList = []
     next(f)
-    for line in f.readline():
+    for line in f:
         if(line[0] == '_'):
             continue
         artList = line.split()
