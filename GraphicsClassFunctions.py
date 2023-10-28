@@ -1,4 +1,6 @@
 import pygame
+import GraphicsClasses as GC
+import BackgroundMap as bg
 
 def getImage(name: str):
     f = open("refArt.txt", 'r')
@@ -12,3 +14,17 @@ def getImage(name: str):
             f.close()
             return artList
     return [name, "nullImg1", "nullImg2"]
+
+
+def absToRelCoords(absCoords, background: bg.Background, windowSize):
+    #background coords will always be <= 0
+    windowCoords = (0 - background.x, 0 - background.y)
+    relCoords = (absCoords[0] - windowCoords[0], absCoords[1] - windowCoords[1])
+    return relCoords
+
+def onScreen(relCoords, size, windowSize):
+    if(relCoords[0] < windowSize[0] and relCoords[0] + size[0] > 0):
+        return True
+    if(relCoords[1] < windowSize[1] and relCoords[1] + size[1] > 0):
+        return True
+    return False
