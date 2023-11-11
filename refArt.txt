@@ -1,3 +1,6 @@
 Crop, Animal, and Item art for FF game
 _Crop_Name				Seed					Sprout					Grown
 Turnip					Art\Turnip_Seed.png		Art\Turnip_Sprout.png	Art\Turnip_Grown.png
+_
+_Animal_Name			Baby					Adult
+Cow

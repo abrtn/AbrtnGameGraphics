@@ -43,9 +43,12 @@ while run:
     WIN.fill((0,0,0))
     bg.draw(WIN)
     for i in plots:
-        i.draw(WIN, bg, (WIDTH, HEIGHT))
-        for j in i.crops:
-            j.draw(WIN, i)
+        if GCF.onScreen((i.x, i.y),(i.width, i.height),(WIDTH,HEIGHT)):
+            i.draw(WIN, bg, (WIDTH, HEIGHT))
+            for j in i.crops:
+                j.draw(WIN, i)
+        else:
+            i.updateRelCoords(WIN, bg, (WIDTH,HEIGHT))
     player.draw(WIN)
     pygame.display.update()
 

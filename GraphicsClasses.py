@@ -91,6 +91,44 @@ class Plot:
         self.cropStart = [self.x + 35, self.y + 30]
         window.blit(self.plot, coords)
         
+    def updateRelCoords(self, window, background: bg.Background, windowSize):
+        absCoords = (self.abs_x, self.abs_y)
+        coords = GCF.absToRelCoords(absCoords, background, windowSize)
+        self.x = coords[0]
+        self.y = coords[1]
+        self.cropStart = [self.x + 35, self.y + 30]
+        
+
+class Pen:
+    def __init__(self, x, y, background: bg.Background, windowSize):
+        self.x = x
+        self.y = y
+        self.abs_x = x + (0-background.x)
+        self.abs_y = y + (0-background.y)
+        self.location = background.locationData
+        self.width = 250
+        self.height = 250
+        self.image = "Art/Pen.png"
+        self.animals = []
+        self.animNum = 0
+        pen = pygame.image.load(self.image)
+        pen = pygame.transform.scale(pen, (self.width,self.height))
+        self.pen = pen
+    
+    def draw(self, window, background: bg.Background, windowSize, x=None, y=None):
+        if(x is None or y is None):
+            absCoords = (self.abs_x, self.abs_y)
+            coords = GCF.absToRelCoords(absCoords, background, windowSize)
+        self.x = coords[0]
+        self.y = coords[1]
+        window.blit(self.plot, coords)
+        
+    def updateRelCoords(self, window, background: bg.Background, windowSize):
+        absCoords = (self.abs_x, self.abs_y)
+        coords = GCF.absToRelCoords(absCoords, background, windowSize)
+        self.x = coords[0]
+        self.y = coords[1]
+
 
 class Crop:
     def __init__(self, name):
@@ -131,4 +169,18 @@ class Crop:
         
     def harvest(self):
         #TODO call c++ harvest method
-        self.kill
+        self.kill()
+        
+
+class Animal:
+    def __init__(self, name):
+        self.name = name
+        self.width = 20
+        self.height = 20
+        self.images = GCF.getImage(name)
+        self.imageIndex = 0
+        anm = pygame.image.load(self.images[1])
+        anm = pygame.transform.scale(anm, (self.width,self.height))
+        self.anm = anm
+        self.loc = [-100, -100]
+        self.anmNumInPen = 0
