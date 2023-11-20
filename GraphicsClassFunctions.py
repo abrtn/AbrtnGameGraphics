@@ -13,10 +13,10 @@ def getImage(name: str):
         if(artList[0] == name):
             f.close()
             return artList
-    return [name, "nullImg1", "nullImg2"]
+    return [name, "Art\Turnip_Grown.png", "Art\Turnip_Grown.png"]
 
 
-def absToRelCoords(absCoords, background: bg.Background, windowSize):
+def absToRelCoords(absCoords, background: bg.Background, windowSize=()):
     #background coords will always be <= 0
     windowCoords = (0 - background.x, 0 - background.y)
     relCoords = (absCoords[0] - windowCoords[0], absCoords[1] - windowCoords[1])

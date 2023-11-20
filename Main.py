@@ -3,6 +3,8 @@ import pygame
 import GraphicsClasses as GC
 import GraphicsClassFunctions as GCF
 import BackgroundMap as BGM
+import StructureClasses as SC
+import DataFunctions as DF
 
 
 WIDTH, HEIGHT = 1000, 800
@@ -25,30 +27,41 @@ while run:
                 run = False
                 break
     keys = pygame.key.get_pressed()
+
     if keys[pygame.K_s]:
-        plt = GC.Plot(100,100,bg,(WIDTH,HEIGHT))
+        #plt = GC.Plot(100,100,bg,(WIDTH,HEIGHT))
+        plt = SC.Plot(WIN)
         plots.append(plt)
+        plt.build(100, 100, bg, (WIDTH,HEIGHT), WIN) 
+        invt = SC.Inventory()
+        invt.addToInvnt(DF.getItem("Turnip_Seed", 26))
     if keys[pygame.K_p]:
        if count - last_pressP >= 10:
              last_pressP = count
-             plt.crops.append(GC.Crop("Turnip"))
-             plt.crops[plt.cropNum].plant(WIN, plt)
+             #plt.crops.append(GC.Crop("Turnip"))
+             #plt.crops[plt.cropNum].plant(WIN, plt)
+             plt.plant("Turnip", 1, invt, WIN)
+    if keys[pygame.K_h]:
+        plt.harvest(invt)
+    if keys[pygame.K_d]:
+        for i in invt.inventory:
+            if i.name != "Null_Item":
+                print(i.name + ", " + str(i.count) + '\n')
+        for i in plt.emptySpots:
+            print(i)
+        print('\n' + str(len(plt.emptySpots)))
     if keys[pygame.K_g]:
          if count - last_pressG >= 10:
              last_pressG = count
              for crp in plt.crops:
-                crp.grow(WIN, plt)
+                if crp.name != "Null_Crop":
+                    crp.advanceDay()
     
     player.controlPlayer((WIDTH, HEIGHT), keys, bg)
     WIN.fill((0,0,0))
     bg.draw(WIN)
     for i in plots:
-        if GCF.onScreen((i.x, i.y),(i.width, i.height),(WIDTH,HEIGHT)):
-            i.draw(WIN, bg, (WIDTH, HEIGHT))
-            for j in i.crops:
-                j.draw(WIN, i)
-        else:
-            i.updateRelCoords(WIN, bg, (WIDTH,HEIGHT))
+        i.draw(WIN, bg, (WIDTH,HEIGHT))
     player.draw(WIN)
     pygame.display.update()
 

@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Art"
+    "\\Art",
+    "\\RefData"
   ],
-  "SelectedNode": "\\refArt.txt",
+  "SelectedNode": "\\RefData\\Items.txt",
   "PreviewInSolutionExplorer": false
 }

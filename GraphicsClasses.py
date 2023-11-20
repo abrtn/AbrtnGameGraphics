@@ -73,11 +73,13 @@ class Plot:
         self.cropNum = 0
         self.cropStart = [self.x + 35, self.y + 30]
         self.step = 35
-        self.cropPos = [(0,0),(1,0),(2,0),(3,0),(4,0),
-                        (0,1),(1,1),(2,1),(3,1),(4,1),
-                        (0,2),(1,2),(2,2),(3,2),(4,2),
-                        (0,3),(1,3),(2,3),(3,3),(4,3),
-                        (0,4),(1,4),(2,4),(3,4),(4,4)]
+        self.next_empty = 24
+        self.cropPos = [(4,4),(3,4),(2,4),(1,4),(0,4),
+                        (4,3),(3,3),(2,3),(1,3),(0,3),
+                        (4,2),(3,2),(2,2),(1,2),(0,2),
+                        (4,1),(3,1),(2,1),(1,1),(0,1),
+                        (4,0),(3,0),(2,0),(1,0),(0,0)]
+        
         plot = pygame.image.load(self.image)
         plot = pygame.transform.scale(plot, (self.width,self.height))
         self.plot = plot
@@ -142,34 +144,29 @@ class Crop:
         self.crop = crop
         self.loc = [-100, -100]
         self.cropNumInPlot = 0
+        self.posInPlot = (0,0)
         
     def plant(self, window, plot: Plot):
-        #TODO call c++ plant
-        if(len(plot.crops) > 25):
-            return
         self.cropNumInPlot = plot.cropNum
-        self.loc[0] = plot.cropStart[0] + (plot.step * plot.cropPos[plot.cropNum][0])
-        self.loc[1] = plot.cropStart[1] + (plot.step * plot.cropPos[plot.cropNum][1])
+        self.posInPlot = plot.cropPos[plot.next_empty]
+        #plot.cropPos.pop()
+        self.loc[0] = plot.cropStart[0] + (plot.step * self.posInPlot[0])
+        self.loc[1] = plot.cropStart[1] + (plot.step * self.posInPlot[1])
         plot.cropNum += 1
         window.blit(self.crop, self.loc)
         
     def draw(self, window, plot:Plot):
-        self.loc[0] = plot.cropStart[0] + (plot.step * plot.cropPos[self.cropNumInPlot][0])
-        self.loc[1] = plot.cropStart[1] + (plot.step * plot.cropPos[self.cropNumInPlot][1])
+        self.loc[0] = plot.cropStart[0] + (plot.step * self.posInPlot[0])
+        self.loc[1] = plot.cropStart[1] + (plot.step * self.posInPlot[1])
         window.blit(self.crop, self.loc)
         
-    def grow(self, window, plot: Plot):
-        #TODO called in c++ new day
+    def grow(self):
         self.imageIndex += 1
         self.imageIndex %= len(self.images) - 1
         crop = pygame.image.load(self.images[self.imageIndex + 1])
         crop = pygame.transform.scale(crop, (self.width,self.height))
         self.crop = crop
-        window.blit(self.crop, self.loc)
         
-    def harvest(self):
-        #TODO call c++ harvest method
-        self.kill()
         
 
 class Animal:

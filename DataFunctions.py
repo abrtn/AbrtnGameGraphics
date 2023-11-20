@@ -6,12 +6,12 @@ ITEM_INDEX = {}
 ANIMAL_INDEX = {}
 
 
-def getCrop(name, num):
-    if name in CROP_INDEX:
-        newCrop = CROP_INDEX[name]
-        return newCrop
+def getCrop(name, num=1):
+    #if name in CROP_INDEX:
+    #    newCrop = CROP_INDEX[name]         TODO
+    #    return newCrop
     f = open("RefData\Crops.txt", 'r')
-    cropData = ["NullCrop", 0]
+    cropData = ["Null_Crop", 0]
     for line in f:
         if line[0] == '_':
             continue
@@ -19,18 +19,18 @@ def getCrop(name, num):
         if lineList[0] == name:
             cropData = lineList
             break
-    newCrop = OC.Crop(cropData[0], num)
-    newCrop.growTime = cropData[1]
+    newCrop = OC.Crop(cropData[0])
+    newCrop.growTime = int(cropData[1])
     CROP_INDEX[name] = newCrop
     return newCrop
         
 
 def getItem(name, num):
-    if name in ITEM_INDEX:
-        newItem = ITEM_INDEX[name]
-        return newItem
+    #if name in ITEM_INDEX:
+    #    newItem = ITEM_INDEX[name]
+    #    return newItem
     f = open("RefData\Items.txt", 'r')
-    itemData = ["NullItem", 0, 0, '-']
+    itemData = ["Null_Item", 0, 0, '-']
     for line in f:
         if line[0] == '_':
             continue
@@ -51,7 +51,7 @@ def getAnimal(species, name):
         newAnml.name = name
         return newAnml
     f = open("RefData\Animals.txt", 'r')
-    anmlData = ["NullAnimal", 0, 0, '-', 0, '-', 0, 0]
+    anmlData = ["Null_Animal", 0, 0, '-', 0, '-', 0, 0]
     for line in f:
         if line[0] == '_':
             continue
