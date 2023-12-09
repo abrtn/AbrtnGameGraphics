@@ -11,10 +11,11 @@ class Inventory:
     
     #TODO same as with plot, fill empty spots with null item and keep track of empty when adding or removing
     
-    def __init__(self):
+    def __init__(self, gold=None):
         self.capacity = 30
         self.inventory = [NULL_ITEM] * self.capacity
         self.emptySpots = [i for i in range(self.capacity -1, -1, -1)]
+        self.gold = gold
         
     
     def clearEmpty(self):
