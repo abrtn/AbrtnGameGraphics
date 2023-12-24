@@ -6,6 +6,7 @@ import BackgroundMap as BGM
 import StructureClasses as SC
 import DataFunctions as DF
 import InventoryShopFunctions as InvntF
+import Collisions as C
 
 
 WIDTH, HEIGHT = 1000, 800
@@ -25,6 +26,8 @@ shop = SC.Inventory()
 shop.addToInvnt(DF.getItem("Turnip_Seed", 50))
 invt = SC.Inventory(50)
 invnt_open = False
+coll = C.Collision()
+
 while run:
     clock.tick(20)
     count += 1
@@ -35,6 +38,10 @@ while run:
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_s]:
+        coll.obsList = [None] * 10
+        coll.tempCollPlacements = set([(100,100), (200,200), (300,300), (400,400), (500,500), (600,600), (700,700), (800,800), (900,900), (1000,1000), (200, 100), (300,100), (500,600), (100,400), (200, 600)])
+        coll.tempCollPositions  = set()
+        coll.generate()
         #plt = GC.Plot(100,100,bg,(WIDTH,HEIGHT))
         plt = SC.Plot(WIN)
         plots.append(plt)
@@ -76,6 +83,7 @@ while run:
             i.draw(WIN, bg, (WIDTH,HEIGHT))
         player.draw(WIN)
         InvntF.displayInventory(WIN, invt)
+        coll.drawObstacles(bg, WIN)
     else:
         InvntF.displayInventory(WIN, invt, open=True, player=player)
     pygame.display.update()

@@ -46,12 +46,12 @@ def getItem(name, num):
     return newItem
 
 def getAnimal(species, name):
-    if species in ANIMAL_INDEX:
-        newAnml = ANIMAL_INDEX[species]
-        newAnml.name = name
-        return newAnml
+    #if species in ANIMAL_INDEX:
+    #    newAnml = ANIMAL_INDEX[species]
+    #    newAnml.name = name
+    #    return newAnml
     f = open("RefData\Animals.txt", 'r')
-    anmlData = ["Null_Animal", 0, 0, '-', 0, '-', 0, 0]
+    anmlData = ["Null_Animal", 0, 0, '-', 0, '-', 0, 0, 0]
     for line in f:
         if line[0] == '_':
             continue
@@ -67,6 +67,7 @@ def getAnimal(species, name):
     newAnml.onDeath = anmlData[5]
     newAnml.growTime = anmlData[6]
     newAnml.predatorRating = anmlData[7]
+    newAnml.size = anmlData[8]
     ANIMAL_INDEX[species] = newAnml
     return newAnml
 

@@ -22,6 +22,8 @@ def numToDisplay(num, pos, WIN):
     # print numbers at given spot
     # pos parameter is upper right corner of number for alignment
     x = pos[0]
+    if num < 0:
+        num = 0
     num = str(num)
     for i in range(len(num) - 1, -1, -1):
         WIN.blit(NUMBERS[num[i]], (x, pos[1]))
@@ -37,7 +39,13 @@ def transferInventory(item: str, count, i1: SC.Inventory, i2: SC.Inventory, shop
     for i in range(len(i1.inventory)):
         if i1.inventory[i].name == item and i1.inventory[i].count >= count:
             itmIndex = i
-            valid_move = True
+            if shop:
+                if i2.gold is not None and i2.gold > int(i1.inventory[i].buyCost):          #TODO can buy to negative amounts
+                    valid_move = True
+                else:
+                    valid_move = True
+            else:
+                valid_move = True
             continue
     if len(i2.emptySpots) == 0:
         valid_move = False

@@ -5,8 +5,10 @@ import BackgroundMap as bg
 
 class Player:
     def __init__(self,x,y,width,height,animated=False):
-        self.x = x
+        self.x = x                  #TODO fix start pos
         self.y = y
+        self.absx = x
+        self.absy = y
         self.images = ["Art\Test_Player.png"]
         self.speed = 20
         self.width = width
@@ -111,8 +113,6 @@ class Pen:
         self.width = 250
         self.height = 250
         self.image = "Art/Pen.png"
-        self.animals = []
-        self.animNum = 0
         pen = pygame.image.load(self.image)
         pen = pygame.transform.scale(pen, (self.width,self.height))
         self.pen = pen

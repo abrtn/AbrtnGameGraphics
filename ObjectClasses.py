@@ -17,8 +17,6 @@ class Crop:
         self.images = GCF.getImage(name)
         self.imageIndex = 0
         
-    #TODO plant and harvest functions that reference graphics
-
     def plant(self, window, plot):
         self.crop.plant(window, plot)
         
@@ -35,7 +33,7 @@ class Crop:
             self.crop.grow()
             self.grown = True
             
-    def draw(self, window, plot):               #TODO since always referenced from plot, rewrite draw function to not need plot?
+    def draw(self, window, plot):
         self.crop.draw(window, plot)
     
 
@@ -58,6 +56,7 @@ class Animal:
         self.name = name
         self.buyCost = 0
         self.sellCost = 0
+        self.size = 1
         self.produced = NULL_ITEM
         self.productionTime = 0
         self.onDeath = NULL_ITEM
@@ -67,6 +66,23 @@ class Animal:
         self.age = 0
         self.timeLastItem = 0
         self.timeLastFed = 0
-        #self.evil = False          Maybe not needed
+        
+    def advanceDay(self, food):
+        if not self.grown:
+            self.age += 1
+            if self.age == self.growTime:
+                self.grown = True
+        self.timeLastItem += 1
+        if len(food) < 1:
+            self.timeLastFed += 1
+            return
+        self.timeLastFed = 0
+        self.timeLastItem += 2
+        food[0].count -= 1
+        if food[0].count == 0:
+            food.pop(0)
+            
+    def draw(self, WIN, pen):
+        pass
         
     

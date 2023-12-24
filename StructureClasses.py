@@ -3,14 +3,13 @@ import ObjectClasses as OC
 import DataFunctions as DF
 import GraphicsClasses as GC
 import GraphicsClassFunctions as GCF
+import BackgroundMap as bg
 
 NULL_CROP = DF.getCrop("Null_Crop", 1)
 NULL_ITEM = DF.getItem("Null_Item", 1)
 
 class Inventory:
-    
-    #TODO same as with plot, fill empty spots with null item and keep track of empty when adding or removing
-    
+        
     def __init__(self, gold=None):
         self.capacity = 30
         self.inventory = [NULL_ITEM] * self.capacity
@@ -81,8 +80,7 @@ class Plot:
                     self.crops[i].draw(window, self.plot)
         else:
             self.plot.updateRelCoords(window, background, size)
-            
-        
+          
     
     def harvest(self, invnt: Inventory):
         for i in range(len(self.crops)):
@@ -101,9 +99,85 @@ class Plot:
                 i.boostMultiplier = mult
 
 
+
 class Pen:
     
-    def __init__(self):
+    def __init__(self, x, y, background: bg.Background, windowSize):
         self.animals = []
         self.food = []
         self.capacity = 5
+        self.spaceFilled = 0
+        self.names = {}
+        self.x = x
+        self.y = y
+        self.abs_x = x + (0-background.x)
+        self.abs_y = y + (0-background.y)
+        self.location = background.locationData
+        self.width = 250
+        self.height = 250
+        self.image = "Art/Pen.png"
+        pen = pygame.image.load(self.image)
+        pen = pygame.transform.scale(pen, (self.width,self.height))
+        self.pen = pen
+        
+    def build(self, x, y, background, size, window):
+        self.x = x
+        self.y = y
+    
+    def draw(self, window, background: bg.Background, windowSize, x=None, y=None):      #TODO
+        pass
+        
+    def updateRelCoords(self, window, background: bg.Background, windowSize):
+        absCoords = (self.abs_x, self.abs_y)
+        coords = GCF.absToRelCoords(absCoords, background, windowSize)
+        self.x = coords[0]
+        self.y = coords[1]
+    
+    def newDay(self):
+        for i in self.animals:
+            i.advanceDay(self.food)
+    
+    def addAnimal(self, anmlType, name, invnt: Inventory):
+        anml = DF.getAnimal(anmlType, name)
+        if self.spaceFilled + anml.size > self.capacity:
+            return
+        if invnt.gold < anml.buyCost:
+            return
+        if name in self.names:
+            return
+        self.names.add(name)
+        invnt.gold -= anml.buyCost
+        self.animals.append(anml)
+        self.spaceFilled += anml.size
+        
+    def milk(self, invnt: Inventory):
+        for i in self.animals:
+            if i.produced.name == "Null":
+                continue
+            if i.timeLastItem < i.productionTime:
+                continue
+            i.timeLastItem = 0
+            invnt.addToInvnt(i.produced)
+            
+    def butcher(self, name, invnt: Inventory):
+        for i in range(len(self.animals)):
+            if self.animals[i].name == name:
+                if self.animals[i].onDeath.name != "Null":
+                    invnt.addToInvnt(self.animals[i].onDeath)
+                self.names.remove(name)
+                self.animals.pop(i)
+                return
+            
+    def feed(self, item, invnt: Inventory, count):
+        if len(self.food) >= 3:
+            return
+        for i in invnt.Inventory:
+            if i.name == item:
+                if i.count < count:
+                    count = i.count
+                i.count -= count
+                itm = DF.getItem(item, count)
+                self.food.append(itm)
+                invnt.clearEmpty()
+                return
+                
