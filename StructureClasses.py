@@ -93,7 +93,7 @@ class Plot:
                 self.emptySpots.sort()
                 
     
-    def boost(self, mult):
+    def boost(self, mult):              #TODO
         for i in self.crops:
             if i.boostMultiplier < mult:
                 i.boostMultiplier = mult

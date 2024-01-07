@@ -19,7 +19,7 @@ last_pressG = 0
 last_pressP = 0
 last_pressD = 0
 count = 0
-player = GC.Player(200,200,75,75,animated=True)
+player = GC.Player(0,0,80,80)
 bg = BGM.Background("Test", 0, 0)
 plots = []
 shop = SC.Inventory()
@@ -76,14 +76,14 @@ while run:
          InvntF.transferInventory("Turnip", 1, invt, shop, shop=True)
         
     if not invnt_open:
-        player.controlPlayer((WIDTH, HEIGHT), keys, bg)
+        player.controlPlayer((WIDTH, HEIGHT), keys, bg, coll)
         WIN.fill((0,0,0))
         bg.draw(WIN)
         for i in plots:
             i.draw(WIN, bg, (WIDTH,HEIGHT))
         player.draw(WIN)
         InvntF.displayInventory(WIN, invt)
-        coll.drawObstacles(bg, WIN)
+        coll.drawObstacles(bg, WIN, (WIDTH,HEIGHT))
     else:
         InvntF.displayInventory(WIN, invt, open=True, player=player)
     pygame.display.update()

@@ -21,5 +21,5 @@ class Background:
         window.blit(self.background, (self.x, self.y))
         
     def changeLoc(self, window):
-        #TODO
+        #TODO?
         pass

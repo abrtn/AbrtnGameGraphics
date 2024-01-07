@@ -1,6 +1,7 @@
 import pygame
 import GraphicsClassFunctions as GCF
 import BackgroundMap as bg
+#import Collisions as C
         
 
 class Player:
@@ -38,27 +39,53 @@ class Player:
         
         window.blit(self.player, (x,y))
         
-    def controlPlayer(self, window_size, keys, background: bg.Background):
+    def controlPlayer(self, window_size, keys, background: bg.Background, coll):
         if keys[pygame.K_LEFT]:
+            collision = coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X')
+            if collision[0]:
+                print("Collision: " + collision[1])
+                return
             if self.x <= 100 and background.x < 0:
                 background.x += self.speed
+                self.absx -= self.speed
             elif self.x > 0:
                 self.x -= self.speed
+                self.absx -= self.speed
         if keys[pygame.K_RIGHT]:
+            collision = coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X')
+            if collision[0]:
+                print("Collision: " + collision[1])
+                return
             if self.x + self.width >= window_size[0] - 100 and background.x > window_size[0] - background.locationData[1]:
                 background.x -= self.speed
+                self.absx += self.speed
             elif self.x + self.width < window_size[0]:
                 self.x += self.speed
+                self.absx += self.speed
         if keys[pygame.K_UP]:
+            collision =  coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y')
+            if collision[0]:
+                print("Collision: " + collision[1])
+                return
             if self.y <= 100 and background.y < 0:
                 background.y += self.speed
+                self.absy -= self.speed
             elif self.y > 0:
                 self.y -= self.speed
+                self.absy -= self.speed
         if keys[pygame.K_DOWN]:
+            collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y')
+            if collision[0]:
+                print("Collision: " + collision[1])
+                return
             if self.y + self.height >= window_size[1] - 100 and background.y > window_size[1] - background.locationData[2]:
                 background.y -= self.speed
+                self.absy += self.speed
             elif self.y + self.height < window_size[1]:
                 self.y += self.speed
+                self.absy += self.speed
+                
+        #print(str(self.absx) + ", " + str(self.absy) + " : " + str(self.x) + ", " + str(self.y))
 
 
 class Plot:
