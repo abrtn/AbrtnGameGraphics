@@ -88,11 +88,21 @@ class Collision:
                 add = i.draw(bg, window, size, canopies)
                 if add:
                     self.onScreenTempColl.append(i)
+        transp = []
+        canopy = set()
         for i in canopies:
             if GCF.checkInside(i, 300, 300, (player.x,player.y), player.width, player.height):
-                window.blit(Collision.canopyTransp, i)
+                transp.append(i)
             else:
-                window.blit(Collision.canopy, i)
+                canopy.add(i)
+        for i in transp:
+            window.blit(Collision.canopyTransp, i)
+            for j in list(canopy):
+                if GCF.checkInside(j, 300, 300, i, 300, 300):
+                    transp.append(j)
+                    canopy.remove(j)
+        for i in canopy:
+            window.blit(Collision.canopy, i)
 
 
 class Obstacle:
@@ -141,7 +151,7 @@ class Obstacle:
         if self.onscreen:
             window.blit(self.image, GCF.absToRelCoords((self.absx, self.absy), bg))
             if self.name == "smallTree" or self.name == "largeTree":
-                canopies.append([coords[0]-((300-self.width)//2), coords[1]-((300-self.width)//2)])
+                canopies.append(tuple([coords[0]-((300-self.width)//2), coords[1]-((300-self.width)//2)]))
             return True
         return False
     

@@ -44,10 +44,9 @@ while run:
             coll.tempCollPlacements = set([(100,100), (200,200), (300,300), (400,400), (500,500), (600,600), (700,700), (800,800), (900,900), (1000,1000), (200, 100), (300,100), (500,600), (100,400), (200, 600)])
             coll.tempCollPositions  = set()
             coll.generate()
-            #plt = GC.Plot(100,100,bg,(WIDTH,HEIGHT))
-            #plt = SC.Plot()
-            #plt.build(100, 100, bg, (WIDTH,HEIGHT), WIN)
-            #plots.append(plt)
+            plt = SC.Plot()
+            plt.build(100, 100, bg, (WIDTH,HEIGHT), WIN)
+            plots.append(plt)
         
         
     if keys[pygame.K_p]:         #TODO fix references
