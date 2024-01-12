@@ -28,3 +28,23 @@ def onScreen(relCoords, size, windowSize):
     if(relCoords[1] < windowSize[1] and relCoords[1] + size[1] > 0):
         return True
     return False
+
+def checkInside(coords1, width1, height1, coords2, width2, height2):
+    # check if object 2 is inside boundary of object 1
+    # check upper left corner
+    if coords2[0] > coords1[0] and coords2[0] < coords1[0] + width1:
+        if coords2[1] > coords1[1] and coords2[1] < coords1[1] + height1:
+            return True
+    # check upper right corner
+    if coords2[0] + width2 > coords1[0] and coords2[0] + width2 < coords1[0] + width1:
+        if coords2[1] > coords1[1] and coords2[1] < coords1[1] + height1:
+            return True
+    # check lower left corner
+    if coords2[0] > coords1[0] and coords2[0] < coords1[0] + width1:
+        if coords2[1] + height2 > coords1[1] and coords2[1] + height2 < coords1[1] + height1:
+            return True
+    # check lower right corner
+    if coords2[0] + width2 > coords1[0] and coords2[0] + width2 < coords1[0] + width1:
+        if coords2[1] + height2 > coords1[1] and coords2[1] + height2 < coords1[1] + height1:
+            return True
+    return False

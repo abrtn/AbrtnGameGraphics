@@ -1,0 +1,9 @@
+_Outside
+
+_Inside_Castle
+
+_Inside_Shop
+
+_Machines
+
+_Misc

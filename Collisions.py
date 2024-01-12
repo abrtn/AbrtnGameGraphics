@@ -9,6 +9,11 @@ import DataFunctions as DF
 # Collisions and obstacles
 class Collision:
     
+    canopy = pygame.image.load("Art\Canopy.png")
+    canopy = pygame.transform.scale(canopy, (300,300))
+    canopyTransp = pygame.image.load("Art\CanopyTransparent.png")
+    canopyTransp = pygame.transform.scale(canopyTransp, (300,300))
+    
     def __init__(self):
         self.obsList = [None] * 10
         
@@ -20,9 +25,11 @@ class Collision:
         self.tempCollPositions  = set()
         
         self.onScreenTempColl = []
+        
+        self.canopy = {}
 
     #When called, x and y coords need to be edge of player, not player x and y
-    def checkColl(self, newX, newY, direction, plots=None, pens=None):
+    def checkColl(self, newX, newY, direction, plots, pens=None):
         # Check with permanent collision boxes
                                     # TODO check with list of coords
         #print(len(self.onScreenTempColl))
@@ -39,20 +46,18 @@ class Collision:
             
         # TODO Check with temp collision boxes
         for i in self.onScreenTempColl:
-            temp = i.checkColl(newX, newY, direction)
-            if temp[0]:
-                return temp
+            if i.checkColl(newX, newY, direction):
+                return i
         
-        #for i in plots:
-        #    temp = i.checkColl(newX, newY, direction)
-        #    if temp[0]:
-        #        return temp
+        for j in plots:
+            if j.checkColl(newX, newY, direction):
+                return j
         
         #for i in pens:
         #    temp = i.checkColl(newX, newY, direction)
         #    if temp[0]:
         #        return temp
-        return False, None
+        return None
 
 
     def generate(self):
@@ -67,20 +72,27 @@ class Collision:
                 self.tempCollPositions.add(coords)
                 
 
-    def removeFromCollision(self, inventory):
+    def removeFromCollision(self, obst, inventory):
         # Mine item
-        coords = (0,0)
+        coords = (obst.absx, obst.absy)
+        obst.mine(inventory)
         self.tempCollPlacements.add(coords)
         self.tempCollPositions.remove(coords)
         
 
-    def drawObstacles(self, bg: BG.Background, window, size):
+    def drawObstacles(self, bg: BG.Background, window, size, player):
+        canopies = []
         self.onScreenTempColl = []
         for i in self.obsList:
             if i is not None and i.name is not None:
-                add = i.draw(bg, window, size)
+                add = i.draw(bg, window, size, canopies)
                 if add:
                     self.onScreenTempColl.append(i)
+        for i in canopies:
+            if GCF.checkInside(i, 300, 300, (player.x,player.y), player.width, player.height):
+                window.blit(Collision.canopyTransp, i)
+            else:
+                window.blit(Collision.canopy, i)
 
 
 class Obstacle:
@@ -89,7 +101,7 @@ class Obstacle:
     types = ["smallRock", "smallTree", "largeRock", "largeTree", "massiveRock"]
     size = [(40,40), (40,40), (60,60), (60,60), (80,80)]
     drops = [("Stone", (2,4)), ("Wood", (2,4)), ("Stone", (3,6)), ("Wood", (5,8)), ("Stone", (6,10))]
-    images = ["Art\Pic3.png", "Art\pic4.png", "Art\pic5.png", "Art\pic6.png", "Art\pic7.png"]
+    images = ["Art\small_rock.png", "Art\small_tree.png", "Art\large_rock.png", "Art\large_tree.png", "Art\massive_rock.png"]
 
     def __init__(self):
         self.name = None
@@ -102,6 +114,7 @@ class Obstacle:
         self.health = 20
         self.image = None
         self.onscreen = False
+        self.canopyTransp = False
         
     def build(self, coords, index):
         self.name = Obstacle.types[index]
@@ -119,14 +132,16 @@ class Obstacle:
             itm = DF.getItem(self.drops, random.choice(range(self.dropQty[0], self.dropQty[1] + 1)))
         else:
             itm = DF.getItem(self.drops, 1)
-        inventory.addToInvnt(itm)
+        #inventory.addToInvnt(itm)                  Temporarily disabled
         self.name = None
         
-    def draw(self, bg: BG.Background, window, size):
+    def draw(self, bg: BG.Background, window, size, canopies):
         coords = GCF.absToRelCoords((self.absx,self.absy), bg, size)
         self.onscreen = GCF.onScreen(coords, (self.width,self.height), size)
         if self.onscreen:
             window.blit(self.image, GCF.absToRelCoords((self.absx, self.absy), bg))
+            if self.name == "smallTree" or self.name == "largeTree":
+                canopies.append([coords[0]-((300-self.width)//2), coords[1]-((300-self.width)//2)])
             return True
         return False
     
@@ -136,11 +151,10 @@ class Obstacle:
             if newX == self.absx or newX == self.absx + self.width:
                 for y in newY:
                     if y >= self.absy and y <= self.absy + self.height:
-                        return True, self.name
+                        return True
         else:
             if newY == self.absy or newY == self.absy + self.height:
                 for x in newX:
                     if x >= self.absx and x <= self.absx + self.width:
-                        return True, self.name
-        return False, None
-    
+                        return True
+        return False

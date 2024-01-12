@@ -30,12 +30,21 @@ class Inventory:
                 return
         self.inventory[self.emptySpots[-1]] = itm
         self.emptySpots.pop()
+        
+    def plant(self, plot, window):
+        # get item to plant
+        for i in range(len(self.inventory)):               #i is item class
+            if self.inventory[i].name == "Turnip" + "_Seed": 
+                plot.plant("Turnip", 1, window)
+                self.inventory[i].count -= 1
+                self.clearEmpty()
+                return
     
 
 
 class Plot:
     
-    def __init__(self, window):
+    def __init__(self):
         self.capacity = 25
         self.numCrops = 0
         self.crops = []
@@ -97,6 +106,20 @@ class Plot:
         for i in self.crops:
             if i.boostMultiplier < mult:
                 i.boostMultiplier = mult
+
+    def checkColl(self, newX, newY, direction):
+        # needs to take in abs coords
+        if direction == 'X' or direction == 'x':
+            if newX == self.plot.abs_x or newX == self.plot.abs_x + self.plot.width:
+                for y in newY:
+                    if y >= self.plot.abs_y and y <= self.plot.abs_y + self.plot.height:
+                        return True
+        else:
+            if newY == self.plot.abs_y or newY == self.plot.abs_y + self.plot.height:
+                for x in newX:
+                    if x >= self.plot.abs_x and x <= self.plot.abs_x + self.plot.width:
+                        return True
+        return False
 
 
 
