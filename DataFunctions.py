@@ -11,7 +11,7 @@ def getCrop(name, num=1):
     #    newCrop = CROP_INDEX[name]         TODO
     #    return newCrop
     f = open("RefData\Crops.txt", 'r')
-    cropData = ["Null_Crop", 0]
+    cropData = ["Null_Crop", 0, "Null"]
     for line in f:
         if line[0] == '_':
             continue

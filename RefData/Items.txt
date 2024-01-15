@@ -24,6 +24,7 @@ Evil_Wheat          4                       3                       Crop
 _-----------------------------------------------------Seeds
 Turnip_Seed         2                       2                       Seed
 Cabbage_Seed        4                       4                       Seed
+Carrot_Seed			2						2						Seed
 _-----------------------------------------------------Boosts
 1.2xFertilizer      10                      10                      Boost
 1.3xFertilizer      15                      15                      Boost

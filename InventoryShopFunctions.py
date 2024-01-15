@@ -65,7 +65,7 @@ def transferInventory(item: str, count, i1: SC.Inventory, i2: SC.Inventory, shop
             i2.gold -= int(itm.buyCost) * count
     
 
-def displayInventory(WIN, invnt, player=None, open=False, invnt2=None, shop=False):
+def displayInventory(WIN, invnt, startindex=0, player=None, open=False, invnt2=None, shop=False):
     if not open:
         numToDisplay(invnt.gold, (960, 15), WIN)
         return
@@ -74,17 +74,69 @@ def displayInventory(WIN, invnt, player=None, open=False, invnt2=None, shop=Fals
     WIN.blit(inventory, (100,100))
     numToDisplay(invnt.gold, (860, 115), WIN)
     y = 120
-    for i in invnt.inventory:
-        if i.name != "Null_Item":
+    for i in range(startindex, startindex + 10):
+        if invnt.inventory[i].name != "Null_Item":
             try:                        # TODO fix when adding item icons
-                item = pygame.image.load("Art\\" + i.name + ".png")
+                item = pygame.image.load("Art\\" + invnt.inventory[i].name + ".png")
             except:
-                item = pygame.image.load("Art\\" + i.name + "_Grown.png")
+                item = pygame.image.load("Art\\" + invnt.inventory[i].name + "_Grown.png")
             WIN.blit(item, (110, y))
-            numToDisplay(i.count, (300, y), WIN)
-            y += 40
-    if not shop:
+            numToDisplay(invnt.inventory[i].count, (300, y), WIN)
+            y += 50
+        else:
+            numToDisplay(i, (150, y), WIN)
+            y += 50
+    if not shop and player is not None:
         plyr = pygame.image.load(player.images[0])
         plyr = pygame.transform.scale(plyr, (250,250))
         WIN.blit(plyr, (600,350))
         
+def getItemClick(invnt: SC.Inventory, mousePos, startindex, invnt2: SC.Inventory =None, shop=False):
+    # Todo work with when 2 inventories
+    if mousePos[0] < 110 or mousePos[0] > 400:
+        return
+    elif mousePos[1] < 120 or mousePos[1] > 610:
+        return
+    item = (mousePos[1] - 115) // 50
+    return startindex + item
+        
+def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize, plots):
+    if not isinstance(plot, SC.Plot):
+        return
+    pygame.mouse.set_visible(True)
+    count = 0
+    last_mouse = 10
+    keys = pygame.key.get_pressed()
+    clock = pygame.time.Clock()
+    while True:
+        clock.tick(20)
+        count += 1
+        pygame.event.get()
+        #for event in pygame.event.get():
+        #    if event.type == pygame.QUIT:
+        #        break
+                
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_p] and count > 10:
+            break
+        if pygame.mouse.get_pressed()[0]:
+            if count - last_mouse >= 10:
+                last_mouse = count
+                coords = pygame.mouse.get_pos()
+                item = getItemClick(invnt, coords, invntindex)
+                if invnt.inventory[item].type == "Seed":
+                    plot.plant(invnt.inventory[item].name, item, invnt, WIN)
+        if keys[pygame.K_DOWN]:
+            invntindex += 1
+        if keys[pygame.K_UP]:
+            invntindex -= 1
+        if invntindex > 20:
+            invntindex = 20
+        elif invntindex < 0:
+            invntindex = 0
+        WIN.fill((0,0,0)) 
+        displayInventory(WIN, invnt, invntindex, open=True)
+        plot.draw(WIN, None, windowSize, 600, 350)
+        pygame.display.update()
+    pygame.mouse.set_visible(False)
+    

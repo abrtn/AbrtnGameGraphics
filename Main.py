@@ -18,16 +18,20 @@ run = True
 last_pressG = 0
 last_pressP = 0
 last_pressD = 0
+last_mouse = 0
 count = 0
 player = GC.Player(0,0,80,80)
 bg = BGM.Background("Test", 0, 0)
 plots = []
 shop = SC.Inventory()
 shop.addToInvnt(DF.getItem("Turnip_Seed", 50))
+shop.addToInvnt(DF.getItem("Carrot_Seed", 50))
 invt = SC.Inventory(50)
 invnt_open = False
 coll = C.Collision()
 check = False
+pygame.mouse.set_visible(False)
+invntindex = 0
 while run:
     clock.tick(20)
     count += 1
@@ -35,6 +39,7 @@ while run:
             if event.type == pygame.QUIT:
                 run = False
                 break
+                
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_s]:
@@ -49,23 +54,17 @@ while run:
             plots.append(plt)
         
         
-    if keys[pygame.K_p]:         #TODO fix references
+    if keys[pygame.K_p]:
         check = True
         if count - last_pressP >= 10:
              last_pressP = count
-             #invt.plant(player.checkTouching(coll, plots), WIN)
              interactive_plot = []
              interactive_plot = [player.checkTouching(coll, plots)]
              if isinstance(interactive_plot[0], SC.Plot):
-             #for i in plots:
-              #   if i.plot.abs_x == interactive_plot[0].plot.abs_x and i.plot.abs_y == interactive_plot[0].plot.abs_y:
-               #      i.plant("Turnip", 1, invt, WIN)
-                interactive_plot[0].plant("Turnip", 1, invt, WIN)
-                #print(plots[0].plot.crops[0].name)
-            
+                InvntF.inventoryPlant(invt, player.checkTouching(coll, plots), invntindex, WIN, (WIDTH,HEIGHT), plots)
+                
     if keys[pygame.K_h]:
         interactive_plt = [player.checkTouching(coll, plots)]
-        print(str(type(interactive_plt[0])))
         if isinstance(interactive_plt[0], SC.Plot):
             interactive_plt[0].harvest(invt)
     if keys[pygame.K_x]:
@@ -82,6 +81,9 @@ while run:
                 if i.name != "Null_Item":
                     print(i.name + ", " + str(i.count) + '\n')
             invnt_open = not invnt_open
+            pygame.mouse.set_visible(invnt_open)
+            pygame.mouse.set_pos((100,100))
+            invntindex = 0
     if keys[pygame.K_g]:
          if count - last_pressG >= 10:
              last_pressG = count
@@ -91,8 +93,13 @@ while run:
                         crp.advanceDay()
     if keys[pygame.K_b]:
         InvntF.transferInventory("Turnip_Seed", 5, shop, invt, shop=True)
+        InvntF.transferInventory("Carrot_Seed", 5, shop, invt, shop=True)
     if keys[pygame.K_l]:
          InvntF.transferInventory("Turnip", 1, invt, shop, shop=True)
+         InvntF.transferInventory("Carrot", 1, invt, shop, shop=True)
+         
+    
+        
         
     if not invnt_open:
         player.controlPlayer((WIDTH, HEIGHT), keys, bg, coll, plots)
@@ -109,7 +116,20 @@ while run:
         InvntF.displayInventory(WIN, invt)
         coll.drawObstacles(bg, WIN, (WIDTH,HEIGHT), player)
     else:
-        InvntF.displayInventory(WIN, invt, open=True, player=player)
+        if pygame.mouse.get_pressed()[0]:
+            if count - last_mouse >= 10:
+                last_mouse = count
+                coords = pygame.mouse.get_pos()
+                InvntF.getItemClick(invt, coords, invntindex) 
+        if keys[pygame.K_DOWN]:
+            invntindex += 1
+        if keys[pygame.K_UP]:
+            invntindex -= 1
+        if invntindex > 20:
+            invntindex = 20
+        elif invntindex < 0:
+            invntindex = 0
+        InvntF.displayInventory(WIN, invt, invntindex, open=True, player=player)
     pygame.display.update()
 
          

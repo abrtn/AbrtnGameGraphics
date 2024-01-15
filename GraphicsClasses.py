@@ -152,8 +152,8 @@ class Pen:
         self.abs_x = x + (0-background.x)
         self.abs_y = y + (0-background.y)
         self.location = background.locationData
-        self.width = 250
-        self.height = 250
+        self.width = 260
+        self.height = 260
         self.image = "Art/Pen.png"
         pen = pygame.image.load(self.image)
         pen = pygame.transform.scale(pen, (self.width,self.height))

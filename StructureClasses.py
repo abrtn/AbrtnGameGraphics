@@ -60,15 +60,14 @@ class Plot:
         for i in self.crops:
             i.advanceDay()
     
-    def plant(self, name, num, invnt: Inventory, window):
-        for i in range(len(invnt.inventory)):               #i is item class
-            if invnt.inventory[i].name == name + "_Seed":                
+    def plant(self, name, i, invnt: Inventory, window):
+        #for i in range(len(invnt.inventory)):               #i is item class
+        #    if invnt.inventory[i].name == name: #+ "_Seed":                
                 #TODO plant multiple at once
                 if self.numCrops < self.capacity:
-                    self.crops[self.emptySpots[-1]] = DF.getCrop(name)
+                    self.crops[self.emptySpots[-1]] = DF.getCrop(name.split('_')[0])
 
                     self.plot.crops.append(self.crops[self.emptySpots[-1]].crop)
-                    self.plot.cropNum += 1
                     
                     self.plot.next_empty = self.emptySpots[-1]
                     self.crops[self.emptySpots[-1]].plant(window, self.plot)
@@ -79,9 +78,9 @@ class Plot:
                     invnt.clearEmpty()
                     return
                 
-    def draw(self, window, background, size):
+    def draw(self, window, background, size, x=None, y=None):
         if GCF.onScreen((self.plot.x, self.plot.y), (self.plot.width,self.plot.height), size):
-            self.plot.draw(window, background, size)
+            self.plot.draw(window, background, size, x=x, y=y)
             if self.plot.cropNum == 0:
                 return
             for i in range(len(self.crops)):
