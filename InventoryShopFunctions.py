@@ -100,7 +100,7 @@ def getItemClick(invnt: SC.Inventory, mousePos, startindex, invnt2: SC.Inventory
     item = (mousePos[1] - 115) // 50
     return startindex + item
         
-def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize, plots):
+def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
     if not isinstance(plot, SC.Plot):
         return
     pygame.mouse.set_visible(True)
@@ -140,3 +140,24 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize, plots
         pygame.display.update()
     pygame.mouse.set_visible(False)
     
+def inventoryAnimal(invnt: SC.Inventory, pen, WIN, windowSize):
+    if not isinstance(pen, SC.Pen):
+        return
+    pygame.mouse.set_visible(True)
+    count = 0
+    last_mouse = 10
+    keys = pygame.key.get_pressed()
+    clock = pygame.time.Clock()
+    while True:
+        clock.tick(20)
+        count += 1
+        pygame.event.get()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a] and count > 10:
+            break
+        # select animal
+        # butcher animal
+        # feed animal
+
+def getPenAnimal(pen, mousePos, WIN):
+    pass

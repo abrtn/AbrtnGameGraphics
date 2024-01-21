@@ -60,14 +60,14 @@ def getAnimal(species, name):
             anmlData = lineList
             break
     newAnml = OC.Animal(anmlData[0], name)
-    newAnml.buyCost = anmlData[1]
-    newAnml.sellCost = anmlData[2]
+    newAnml.buyCost = int(anmlData[1])
+    newAnml.sellCost = int(anmlData[2])
     newAnml.produced = anmlData[3]
-    newAnml.productionTime = anmlData[4]
+    newAnml.productionTime = int(anmlData[4])
     newAnml.onDeath = anmlData[5]
-    newAnml.growTime = anmlData[6]
-    newAnml.predatorRating = anmlData[7]
-    newAnml.size = anmlData[8]
+    newAnml.growTime = int(anmlData[6])
+    newAnml.predatorRating = int(anmlData[7])
+    newAnml.size = int(anmlData[8])
     ANIMAL_INDEX[species] = newAnml
     return newAnml
 

@@ -7,3 +7,4 @@ Horse               2000                        2200                    -       
 Unicorn             15000                       30000                   Stardust                21                          Powdered_horn           28                  1				2
 Dragonlet           30000                       45000                   Scales                  28                          Dragon_skin             28                  2				3
 Evil_Dragonlet      30000                       45000                   Scales                  28                          Dragon_skin             28                  2				3
+Lesser_Wyrm			20000						30000					Spice					28							Wyrm_Tooth				28					2				4

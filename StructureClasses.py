@@ -31,14 +31,6 @@ class Inventory:
         self.inventory[self.emptySpots[-1]] = itm
         self.emptySpots.pop()
         
-    def plant(self, plot, window):
-        # get item to plant
-        for i in range(len(self.inventory)):               #i is item class
-            if self.inventory[i].name == "Turnip" + "_Seed": 
-                plot.plant("Turnip", 1, window)
-                self.inventory[i].count -= 1
-                self.clearEmpty()
-                return
     
 
 
@@ -124,32 +116,59 @@ class Plot:
 
 class Pen:
     
-    def __init__(self, x, y, background: bg.Background, windowSize):
+    def __init__(self):
         self.animals = []
         self.food = []
         self.capacity = 5
         self.spaceFilled = 0
-        self.names = {}
-        self.x = x
-        self.y = y
-        self.abs_x = x + (0-background.x)
-        self.abs_y = y + (0-background.y)
-        self.location = background.locationData
-        self.width = 250
-        self.height = 250
+        self.names = set()
+        self.animalStart = (0,0)
+        self.x = 0
+        self.y = 0
+        self.abs_x = 0
+        self.abs_y = 0
+        self.width = 400
+        self.height = 260
         self.image = "Art/Pen.png"
         pen = pygame.image.load(self.image)
         pen = pygame.transform.scale(pen, (self.width,self.height))
         self.pen = pen
+        self.rotated = False
         
     def build(self, x, y, background, size, window):
         self.x = x
         self.y = y
+        self.abs_x = x + (0-background.x)
+        self.abs_y = y + (0-background.y)
+        self.animalStart = (x+20, y+20)
     
-    def draw(self, window, background: bg.Background, windowSize, x=None, y=None):      #TODO
-        pass
+    def draw(self, window, background: bg.Background, windowSize, x=None, y=None):
+        # Animal size of 1 is 52x150
+        # For size of i, image size is (52*i)+(20*(i-1))x150
+            # doubles size and adds the 20 pixels in between
+        if GCF.onScreen((self.x, self.y), (self.width,self.height), windowSize):
+            if(x is None or y is None):
+                absCoords = (self.abs_x, self.abs_y)
+                coords = GCF.absToRelCoords(absCoords, background, windowSize)
+                self.x = coords[0]
+                self.y = coords[1]
+                self.animalStart = (self.x+20, self.y+20)
+            else:
+                coords = [x, y]
+                self.animalStart = (x+20, y+20)
+            window.blit(self.pen, coords)
+            if self.spaceFilled == 0:
+                return
+            j = 0
+            for i in range(len(self.animals)):
+                if self.animals[i].name != "Null_Animal":
+                    self.animals[i].draw(window, self.animalStart, j)
+                    j += self.animals[i].size
+        else:
+            self.updateRelCoords(background, windowSize)
         
-    def updateRelCoords(self, window, background: bg.Background, windowSize):
+        
+    def updateRelCoords(self, background: bg.Background, windowSize):
         absCoords = (self.abs_x, self.abs_y)
         coords = GCF.absToRelCoords(absCoords, background, windowSize)
         self.x = coords[0]
@@ -159,18 +178,21 @@ class Pen:
         for i in self.animals:
             i.advanceDay(self.food)
     
-    def addAnimal(self, anmlType, name, invnt: Inventory):
+    def addAnimal(self, anmlType, name, invnt: Inventory = None):
         anml = DF.getAnimal(anmlType, name)
+        print(anml.species)
         if self.spaceFilled + anml.size > self.capacity:
             return
-        if invnt.gold < anml.buyCost:
-            return
+        #if invnt.gold < anml.buyCost:
+        #    return
         if name in self.names:
             return
         self.names.add(name)
-        invnt.gold -= anml.buyCost
+        #invnt.gold -= anml.buyCost
         self.animals.append(anml)
+        print(len(self.animals))
         self.spaceFilled += anml.size
+        print(self.spaceFilled)
         
     def milk(self, invnt: Inventory):
         for i in self.animals:
@@ -202,4 +224,18 @@ class Pen:
                 self.food.append(itm)
                 invnt.clearEmpty()
                 return
+            
+    def checkColl(self, newX, newY, direction):
+        # needs to take in abs coords
+        if direction == 'X' or direction == 'x':
+            if newX == self.abs_x or newX == self.abs_x + self.width:
+                for y in newY:
+                    if y >= self.abs_y and y <= self.abs_y + self.height:
+                        return True
+        else:
+            if newY == self.abs_y or newY == self.abs_y + self.height:
+                for x in newX:
+                    if x >= self.abs_x and x <= self.abs_x + self.width:
+                        return True
+        return False
                 

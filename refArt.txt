@@ -1,7 +1,8 @@
 Crop, Animal, and Item art for FF game
-_Crop_Name				Seed					Sprout					Grown
+_ Crop_Name				Seed					Sprout					Grown
 Turnip					Art\Turnip_Seed.png		Art\Turnip_Sprout.png	Art\Turnip_Grown.png
 Carrot					Art\Carrot_Seed.png		Art\Carrot_Sprout.png	Art\Carrot_Grown.png
 _
-_Animal_Name			Baby					Adult
-Cow
+_ Animal_Name			Baby					Adult
+Cow						Art\Cow.png				Art\Cow.png
+Lesser_Wyrm				Art\Wyrm.png			Art\Wyrm.png

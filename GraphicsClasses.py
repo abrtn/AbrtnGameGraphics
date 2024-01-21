@@ -106,7 +106,7 @@ class Plot:
         self.y = y
         self.abs_x = x + (0-background.x)
         self.abs_y = y + (0-background.y)
-        self.location = background.locationData
+        #self.location = background.locationData
         self.width = 260
         self.height = 260
         self.image = "Art/Plot.png"

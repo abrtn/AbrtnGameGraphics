@@ -66,12 +66,17 @@ class Animal:
         self.age = 0
         self.timeLastItem = 0
         self.timeLastFed = 0
+        self.images = GCF.getImage(species)
+        self.imageIndex = 1
+        self.animal = pygame.image.load(self.images[self.imageIndex])
         
     def advanceDay(self, food):
         if not self.grown:
             self.age += 1
             if self.age == self.growTime:
                 self.grown = True
+                self.imageIndex = 2
+                self.animal = pygame.image.load(self.images[self.imageIndex])
         self.timeLastItem += 1
         if len(food) < 1:
             self.timeLastFed += 1
@@ -82,7 +87,12 @@ class Animal:
         if food[0].count == 0:
             food.pop(0)
             
-    def draw(self, WIN, pen):
-        pass
+    def draw(self, WIN, animalStart, i):
+        # Animal size of 1 is 52x150 pixels
+        # For size of i, image size is (52*i)+(20*(i-1))x150 pixels
+            # doubles size and adds the 20 pixels in between
+        #print("Here")
+        coords = [animalStart[0] + (i * 72), animalStart[1]]
+        WIN.blit(self.animal, coords)
         
     

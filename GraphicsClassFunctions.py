@@ -11,6 +11,7 @@ def getImage(name: str):
             continue
         artList = line.split()
         if(artList[0] == name):
+            print(artList)
             f.close()
             return artList
     return [name, "Art\Turnip_Grown.png", "Art\Turnip_Grown.png"]
