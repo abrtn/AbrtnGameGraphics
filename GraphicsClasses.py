@@ -39,9 +39,9 @@ class Player:
         
         window.blit(self.player, (x,y))
         
-    def controlPlayer(self, window_size, keys, background: bg.Background, coll, plots, pens=None):
+    def controlPlayer(self, window_size, keys, background: bg.Background, coll, plots, pens):
         if keys[pygame.K_LEFT]:
-            collision = coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots)
+            collision = coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
@@ -52,7 +52,7 @@ class Player:
                 self.x -= self.speed
                 self.absx -= self.speed
         if keys[pygame.K_RIGHT]:
-            collision = coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots)
+            collision = coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
@@ -63,7 +63,7 @@ class Player:
                 self.x += self.speed
                 self.absx += self.speed
         if keys[pygame.K_UP]:
-            collision =  coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots)
+            collision =  coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots, pens)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
@@ -74,7 +74,7 @@ class Player:
                 self.y -= self.speed
                 self.absy -= self.speed
         if keys[pygame.K_DOWN]:
-            collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots)
+            collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots, pens)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
@@ -85,19 +85,19 @@ class Player:
                 self.y += self.speed
                 self.absy += self.speed
                 
-    def checkTouching(self, coll, plots, pens=None):
-        collision = coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots)
+    def checkTouching(self, coll, plots, pens):
+        collision = coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
         if collision is not None:
-            return coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots)
-        collision = coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots)
+            return coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
+        collision = coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
         if collision is not None:
-            return coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots)
-        collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots)
+            return coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
+        collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots, pens)
         if collision is not None:
-            return coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots)
-        collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots)
+            return coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots, pens)
+        collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots, pens)
         if collision is not None:
-            return coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots)
+            return coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots, pens)
         return None
 
 class Plot:

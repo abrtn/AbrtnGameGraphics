@@ -116,6 +116,8 @@ class Plot:
 
 class Pen:
     
+    #TODO maybe? get animals to space out like crops when removed and fill in empty spots
+    
     def __init__(self):
         self.animals = []
         self.food = []
@@ -130,39 +132,69 @@ class Pen:
         self.width = 400
         self.height = 260
         self.image = "Art/Pen.png"
+        self.rotation = 0
         pen = pygame.image.load(self.image)
         pen = pygame.transform.scale(pen, (self.width,self.height))
+        pen = pygame.transform.rotate(pen, -90 * self.rotation)
+        self.penUnRot = pen
         self.pen = pen
-        self.rotated = False
         
-    def build(self, x, y, background, size, window):
+    def build(self, x, y, background, size, window, rotation):
         self.x = x
         self.y = y
         self.abs_x = x + (0-background.x)
         self.abs_y = y + (0-background.y)
+        self.rotation = rotation
+        self.pen = pygame.transform.rotate(self.pen, -90 * self.rotation)
         self.animalStart = (x+20, y+20)
+        
     
-    def draw(self, window, background: bg.Background, windowSize, x=None, y=None):
+    def draw(self, window, background: bg.Background, windowSize, x=None, y=None, rotation = None):
         # Animal size of 1 is 52x150
         # For size of i, image size is (52*i)+(20*(i-1))x150
             # doubles size and adds the 20 pixels in between
         if GCF.onScreen((self.x, self.y), (self.width,self.height), windowSize):
-            if(x is None or y is None):
+            # either all three or none should be None
+            if(x is None or y is None or rotation is None):
                 absCoords = (self.abs_x, self.abs_y)
                 coords = GCF.absToRelCoords(absCoords, background, windowSize)
                 self.x = coords[0]
                 self.y = coords[1]
-                self.animalStart = (self.x+20, self.y+20)
+                
+                # figure out start pos from rotation. Always top left corner of unrotated pen
+                if self.rotation % 4 == 0:
+                    self.animalStart = (self.x+20, self.y+20)
+                elif self.rotation % 4 == 1:
+                    self.animalStart = (self.x+self.height-20-150, self.y+20)
+                elif self.rotation % 4 == 2:
+                    self.animalStart = (self.x+self.width-20, self.y+self.height-20)
+                elif self.rotation % 4 == 3:
+                    self.animalStart = (self.x+20, self.y+self.width-20)
+                    
+                rotation = self.rotation
+                window.blit(self.pen, coords)
             else:
                 coords = [x, y]
-                self.animalStart = (x+20, y+20)
-            window.blit(self.pen, coords)
+                pen = pygame.transform.rotate(self.penUnRot, rotation * -90)
+                
+                # figure out start pos from rotation. Always top left corner of unrotated pen
+                if rotation % 4 == 0:
+                    self.animalStart = (x+20, y+20)
+                elif rotation % 4 == 1:
+                    self.animalStart = (x+self.height-20-150, y+20)
+                elif rotation % 4 == 2:
+                    self.animalStart = (x+self.width-20, y+self.height-20)
+                elif rotation % 4 == 3:
+                    self.animalStart = (x+20, y+self.width-20)
+                    
+                window.blit(pen, coords)
+                
             if self.spaceFilled == 0:
                 return
             j = 0
             for i in range(len(self.animals)):
-                if self.animals[i].name != "Null_Animal":
-                    self.animals[i].draw(window, self.animalStart, j)
+                if self.animals[i].species != "Null_Animal":
+                    self.animals[i].draw(window, self.animalStart, j, rotation)
                     j += self.animals[i].size
         else:
             self.updateRelCoords(background, windowSize)
@@ -178,21 +210,16 @@ class Pen:
         for i in self.animals:
             i.advanceDay(self.food)
     
-    def addAnimal(self, anmlType, name, invnt: Inventory = None):
+    def addAnimal(self, anmlType, name):
         anml = DF.getAnimal(anmlType, name)
         print(anml.species)
         if self.spaceFilled + anml.size > self.capacity:
             return
-        #if invnt.gold < anml.buyCost:
-        #    return
         if name in self.names:
             return
         self.names.add(name)
-        #invnt.gold -= anml.buyCost
         self.animals.append(anml)
-        print(len(self.animals))
         self.spaceFilled += anml.size
-        print(self.spaceFilled)
         
     def milk(self, invnt: Inventory):
         for i in self.animals:
@@ -227,15 +254,28 @@ class Pen:
             
     def checkColl(self, newX, newY, direction):
         # needs to take in abs coords
-        if direction == 'X' or direction == 'x':
-            if newX == self.abs_x or newX == self.abs_x + self.width:
-                for y in newY:
-                    if y >= self.abs_y and y <= self.abs_y + self.height:
-                        return True
+        if self.rotation % 4 == 0 or self.rotation % 4 == 2:
+            if direction == 'X' or direction == 'x':
+                if newX == self.abs_x or newX == self.abs_x + self.width:
+                    for y in newY:
+                        if y >= self.abs_y and y <= self.abs_y + self.height:
+                            return True
+            else:
+                if newY == self.abs_y or newY == self.abs_y + self.height:
+                    for x in newX:
+                        if x >= self.abs_x and x <= self.abs_x + self.width:
+                            return True
         else:
-            if newY == self.abs_y or newY == self.abs_y + self.height:
-                for x in newX:
-                    if x >= self.abs_x and x <= self.abs_x + self.width:
-                        return True
+            # checks if pen is rotated, if so swap width and height
+            if direction == 'X' or direction == 'x':
+                if newX == self.abs_x or newX == self.abs_x + self.height:
+                    for y in newY:
+                        if y >= self.abs_y and y <= self.abs_y + self.width:
+                            return True
+            else:
+                if newY == self.abs_y or newY == self.abs_y + self.width:
+                    for x in newX:
+                        if x >= self.abs_x and x <= self.abs_x + self.height:
+                            return True
         return False
                 

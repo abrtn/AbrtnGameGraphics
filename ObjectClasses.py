@@ -1,3 +1,4 @@
+from itertools import filterfalse
 import pygame
 import StructureClasses as SC
 import GraphicsClasses as GC
@@ -87,12 +88,22 @@ class Animal:
         if food[0].count == 0:
             food.pop(0)
             
-    def draw(self, WIN, animalStart, i):
+    def draw(self, WIN, animalStart, i, rotation):
         # Animal size of 1 is 52x150 pixels
         # For size of i, image size is (52*i)+(20*(i-1))x150 pixels
             # doubles size and adds the 20 pixels in between
-        #print("Here")
-        coords = [animalStart[0] + (i * 72), animalStart[1]]
-        WIN.blit(self.animal, coords)
+
+        # fix coords of animal incrementing so can go from bottom up
+        if rotation % 4 == 0:
+            coords = [animalStart[0] + (i * 72), animalStart[1]]
+        elif rotation % 4 == 1:
+            coords = [animalStart[0], animalStart[1] + (i * 72)]
+        elif rotation % 4 == 2:
+            coords = [animalStart[0] - (i * 72) - (self.size * 72), animalStart[1] - 150]
+        elif rotation % 4 == 3:
+            coords = [animalStart[0], animalStart[1] - (i * 72) - (self.size * 72)]
+
+        animal = pygame.transform.rotate(self.animal, rotation * -90)
+        WIN.blit(animal, coords)
         
     

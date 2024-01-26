@@ -29,7 +29,7 @@ class Collision:
         self.canopy = {}
 
     #When called, x and y coords need to be edge of player, not player x and y
-    def checkColl(self, newX, newY, direction, plots, pens=None):
+    def checkColl(self, newX, newY, direction, plots, pens):
         # Check with permanent collision boxes
                                     # TODO check with list of coords
         #print(len(self.onScreenTempColl))
@@ -53,10 +53,9 @@ class Collision:
             if j.checkColl(newX, newY, direction):
                 return j
         
-        #for i in pens:
-        #    temp = i.checkColl(newX, newY, direction)
-        #    if temp[0]:
-        #        return temp
+        for i in pens:
+            if i.checkColl(newX, newY, direction):
+                return i
         return None
 
 

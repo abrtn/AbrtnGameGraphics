@@ -59,30 +59,38 @@ while run:
         if count - last_pressP >= 10:
             last_pressP = count
             pen = SC.Pen()
-            pen.build(100, 100, bg, (WIDTH,HEIGHT), WIN)
+            pen.build(100, 100, bg, (WIDTH,HEIGHT), WIN, 3)
             pens.append(pen)
     
     if keys[pygame.K_w]:
-        pens[len(pens)-1].addAnimal("Lesser_Wyrm", str(count))
+        interactive_plot = []
+        interactive_plot = [player.checkTouching(coll, plots, pens)]
+        if isinstance(interactive_plot[0], SC.Pen):
+            interactive_plot[0].addAnimal("Lesser_Wyrm", str(count))
     
     if keys[pygame.K_c]:
-        pens[len(pens)-1].addAnimal("Cow", str(count))
+        interactive_plot = []
+        interactive_plot = [player.checkTouching(coll, plots, pens)]
+        if isinstance(interactive_plot[0], SC.Pen):
+            interactive_plot[0].addAnimal("Cow", str(count))
 
     if keys[pygame.K_p]:
         check = True
         if count - last_pressP >= 10:
              last_pressP = count
              interactive_plot = []
-             interactive_plot = [player.checkTouching(coll, plots)]
+             interactive_plot = [player.checkTouching(coll, plots, pens)]
              if isinstance(interactive_plot[0], SC.Plot):
-                InvntF.inventoryPlant(invt, player.checkTouching(coll, plots), invntindex, WIN, (WIDTH,HEIGHT))
+                 InvntF.inventoryPlant(invt, interactive_plot[0], invntindex, WIN, (WIDTH,HEIGHT))
+             if isinstance(interactive_plot[0], SC.Pen):
+                 InvntF.inventoryAnimal(invt, interactive_plot[0], invntindex, WIN, (WIDTH,HEIGHT))
                 
     if keys[pygame.K_h]:
-        interactive_plt = [player.checkTouching(coll, plots)]
+        interactive_plt = [player.checkTouching(coll, plots, pens)]
         if isinstance(interactive_plt[0], SC.Plot):
             interactive_plt[0].harvest(invt)
     if keys[pygame.K_x]:
-        interactive = [player.checkTouching(coll, plots)]
+        interactive = [player.checkTouching(coll, plots, pens)]
         if isinstance(interactive[0], C.Obstacle):
             interactive[0].health -= 10
             if interactive[0].health <= 0:
@@ -116,7 +124,7 @@ while run:
         
         
     if not invnt_open:
-        player.controlPlayer((WIDTH, HEIGHT), keys, bg, coll, plots)
+        player.controlPlayer((WIDTH, HEIGHT), keys, bg, coll, plots, pens)
         WIN.fill((0,0,0))
         bg.draw(WIN)
         for i in plots:

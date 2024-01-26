@@ -140,7 +140,7 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
         pygame.display.update()
     pygame.mouse.set_visible(False)
     
-def inventoryAnimal(invnt: SC.Inventory, pen, WIN, windowSize):
+def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
     if not isinstance(pen, SC.Pen):
         return
     pygame.mouse.set_visible(True)
@@ -148,16 +148,30 @@ def inventoryAnimal(invnt: SC.Inventory, pen, WIN, windowSize):
     last_mouse = 10
     keys = pygame.key.get_pressed()
     clock = pygame.time.Clock()
+    
+    # deal with rotation for drawing pen
     while True:
         clock.tick(20)
         count += 1
         pygame.event.get()
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_a] and count > 10:
+        if keys[pygame.K_p] and count > 10:
             break
         # select animal
         # butcher animal
         # feed animal
-
-def getPenAnimal(pen, mousePos, WIN):
+        if pygame.mouse.get_pressed()[0]:
+            if count - last_mouse >= 10:
+                last_mouse = count
+                coords = pygame.mouse.get_pos()
+                item = getPenAnimal(invnt, coords)
+        displayInventory(WIN, invnt, invntindex, open=True)
+        pen.draw(WIN, None, windowSize, 600, 200, rotation=1)
+        #pen = pygame.image.load(self.image)
+        #pen = pygame.transform.scale(pen, (self.width,self.height))
+        #pen = pygame.transform.rotate(pen, -90 * self.rotated)
+        pygame.display.update()
+    
+def getPenAnimal(pen, mousePos):
     pass
+
