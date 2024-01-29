@@ -30,29 +30,27 @@ def numToDisplay(num, pos, WIN):
         x -= NUM_WIDTH
 
 
-def transferInventory(item: str, count, i1: SC.Inventory, i2: SC.Inventory, shop=False):
+def transferInventory(itmIndex: str, count, i1: SC.Inventory, i2: SC.Inventory, shop=False):
     # transfer from i1 to i2
     # if shop, also change gold
     # buying/selling will have shop True, chests will be False
     # both shops and chests will have gold = None
-    valid_move = False
-    for i in range(len(i1.inventory)):
-        if i1.inventory[i].name == item and i1.inventory[i].count >= count:
-            itmIndex = i
-            if shop:
-                if i2.gold is not None and i2.gold > int(i1.inventory[i].buyCost):          #TODO can buy to negative amounts
-                    valid_move = True
-                else:
-                    valid_move = True
-            else:
-                valid_move = True
-            continue
+    if count > i1.inventory[itmIndex].count:
+        return    
+            
+    if shop:
+        if i2.gold is not None and i2.gold > int(i1.inventory[itmIndex].buyCost):          #TODO can buy to negative amounts
+            valid_move = True
+        else:
+            valid_move = True
+    else:
+        valid_move = True
     if len(i2.emptySpots) == 0:
         valid_move = False
     if not valid_move:
         return
     
-    itm = DF.getItem(item, count)
+    itm = DF.getItem(i1.inventory[itmIndex].name, count)
     i1.inventory[itmIndex].count -= count
     i1.clearEmpty()
     i2.addToInvnt(itm)
@@ -86,23 +84,43 @@ def displayInventory(WIN, invnt, startindex=0, player=None, open=False, invnt2=N
         else:
             numToDisplay(i, (150, y), WIN)
             y += 50
-    if not shop and player is not None:
+           
+    y = 120
+    if invnt2 is not None:
+        for i in range(len(invnt2.inventory)):
+            if invnt2.inventory[i].name != "Null_Item":
+                try:                        # TODO fix when adding item icons
+                    item = pygame.image.load("Art\\" + invnt2.inventory[i].name + ".png")
+                except:
+                    item = pygame.image.load("Art\\" + invnt2.inventory[i].name + "_Grown.png")
+                WIN.blit(item, (520, y))
+                if shop:
+                    numToDisplay(invnt2.inventory[i].sellCost, (710, y), WIN)
+                else:
+                    numToDisplay(invnt2.inventory[i].count, (710, y), WIN)
+                y += 50
+                
+    if player is not None:
         plyr = pygame.image.load(player.images[0])
         plyr = pygame.transform.scale(plyr, (250,250))
         WIN.blit(plyr, (600,350))
         
-def getItemClick(invnt: SC.Inventory, mousePos, startindex, invnt2: SC.Inventory =None, shop=False):
-    # Todo work with when 2 inventories
+def getItemClick(invnt: SC.Inventory, mousePos, startindex, invnt2: SC.Inventory =None, start2=None):
+    # both or neither invnt2 and start2 must be None
+    if invnt2 is not None:
+        if mousePos[0] >= 520 and mousePos[0] <= 710:
+            if mousePos[1] >= 120 and mousePos[1] <= 610:
+                item = (mousePos[1] - 115) // 50
+                return start2 + item, 2
+
     if mousePos[0] < 110 or mousePos[0] > 400:
         return
     elif mousePos[1] < 120 or mousePos[1] > 610:
         return
     item = (mousePos[1] - 115) // 50
-    return startindex + item
+    return startindex + item, 1
         
 def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
-    if not isinstance(plot, SC.Plot):
-        return
     pygame.mouse.set_visible(True)
     count = 0
     last_mouse = 10
@@ -123,9 +141,10 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
             if count - last_mouse >= 10:
                 last_mouse = count
                 coords = pygame.mouse.get_pos()
+                print(coords)
                 item = getItemClick(invnt, coords, invntindex)
-                if invnt.inventory[item].type == "Seed":
-                    plot.plant(invnt.inventory[item].name, item, invnt, WIN)
+                if item is not None and invnt.inventory[item[0]].type == "Seed":
+                    plot.plant(invnt.inventory[item[0]].name, item[0], invnt, WIN)
         if keys[pygame.K_DOWN]:
             invntindex += 1
         if keys[pygame.K_UP]:
@@ -141,14 +160,13 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
     pygame.mouse.set_visible(False)
     
 def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
-    if not isinstance(pen, SC.Pen):
-        return
     pygame.mouse.set_visible(True)
     count = 0
     last_mouse = 10
     keys = pygame.key.get_pressed()
     clock = pygame.time.Clock()
-    
+    animal = None
+    print(len(pen.animals))
     # deal with rotation for drawing pen
     while True:
         clock.tick(20)
@@ -157,21 +175,88 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_p] and count > 10:
             break
-        # select animal
         # butcher animal
         # feed animal
         if pygame.mouse.get_pressed()[0]:
             if count - last_mouse >= 10:
                 last_mouse = count
                 coords = pygame.mouse.get_pos()
-                item = getPenAnimal(invnt, coords)
+                print(coords)
+                animal = getPenAnimal(pen, coords)
+                if animal is not None:
+                    print(animal.species)
+        if keys[pygame.K_b]:
+            if animal is None:
+                continue
+            pen.butcher(animal, invnt)
+            animal = None
+        if keys[pygame.K_DOWN]:
+            invntindex += 1
+        if keys[pygame.K_UP]:
+            invntindex -= 1
+        if invntindex > 20:
+            invntindex = 20
+        elif invntindex < 0:
+            invntindex = 0
         displayInventory(WIN, invnt, invntindex, open=True)
         pen.draw(WIN, None, windowSize, 600, 200, rotation=1)
-        #pen = pygame.image.load(self.image)
-        #pen = pygame.transform.scale(pen, (self.width,self.height))
-        #pen = pygame.transform.rotate(pen, -90 * self.rotated)
         pygame.display.update()
     
 def getPenAnimal(pen, mousePos):
-    pass
+    if mousePos[0] > 840 or mousePos[0] < 690:
+        return None
+    elif mousePos[1] > 580 or mousePos[1] < 220:
+        return None
+    space = (mousePos[1] - 210) // 72 + 1
+    size = 0
+    for i in pen.animals:
+        size += i.size
+        if size >= space:
+            if i.name != "Null_Animal":
+                return i
+            return None
+    return None
+
+def inventoryShop(invnt: SC.Inventory, invnt2: SC.Inventory, invntindex, WIN, windowsize, shop=False):
+    pygame.mouse.set_visible(True)
+    count = 0
+    last_mouse = 10
+    keys = pygame.key.get_pressed()
+    clock = pygame.time.Clock()
+    while True:
+        clock.tick(20)
+        count += 1
+        pygame.event.get()
+        #for event in pygame.event.get():
+        #    if event.type == pygame.QUIT:
+        #        break
+                
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_b] and count > 10:
+            break
+        
+        if pygame.mouse.get_pressed()[0]:
+            if count - last_mouse >= 10:
+                last_mouse = count
+                coords = pygame.mouse.get_pos()
+                item = getItemClick(invnt, coords, invntindex, invnt2=invnt2, start2=0)
+                print(item)
+                if item is not None:
+                    if item[1] == 1:
+                        transferInventory(item[0], 1, invnt, invnt2, shop=shop)
+                    elif item[1] == 2:
+                        transferInventory(item[0], 1, invnt2, invnt, shop=shop)
+        
+        if keys[pygame.K_DOWN]:
+            invntindex += 1
+        if keys[pygame.K_UP]:
+            invntindex -= 1
+        if invntindex > 20:
+            invntindex = 20
+        elif invntindex < 0:
+            invntindex = 0
+            
+        WIN.fill((0,0,0)) 
+        displayInventory(WIN, invnt, invntindex, invnt2=invnt2, shop=shop, open=True)
+        pygame.display.update()
 

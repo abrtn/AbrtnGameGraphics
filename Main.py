@@ -8,6 +8,11 @@ import DataFunctions as DF
 import InventoryShopFunctions as InvntF
 import Collisions as C
 
+#######################################################
+#######################################################
+# NEXT TODO: Fix butcher function and feeding animals #
+#######################################################
+#######################################################
 
 WIDTH, HEIGHT = 1000, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -27,12 +32,17 @@ pens = []
 shop = SC.Inventory()
 shop.addToInvnt(DF.getItem("Turnip_Seed", 50))
 shop.addToInvnt(DF.getItem("Carrot_Seed", 50))
+shop.addToInvnt(DF.getItem("Turnip", 50))
+shop.addToInvnt(DF.getItem("Carrot", 50))
 invt = SC.Inventory(50)
 invnt_open = False
 coll = C.Collision()
 check = False
 pygame.mouse.set_visible(False)
 invntindex = 0
+rotation = 0
+chest = SC.Inventory()
+
 while run:
     clock.tick(20)
     count += 1
@@ -54,12 +64,27 @@ while run:
             plt.build(100, 100, bg, (WIDTH,HEIGHT), WIN)
             plots.append(plt)
         
-        
+    if keys[pygame.K_m]:
+        interactive_plot = []
+        interactive_plot = [player.checkTouching(coll, plots, pens)]
+        if isinstance(interactive_plot[0], SC.Pen):
+            interactive_plot[0].milk(invt)
+            
+    if keys[pygame.K_r]:
+        if count - last_pressP >= 10:
+            last_pressP = count
+            rotation = (rotation + 1 ) % 4
+    
+    if keys[pygame.K_t]:
+        if count - last_pressP >= 10:
+            last_pressP = count
+            InvntF.inventoryShop(invt, chest, invntindex, WIN, (WIDTH,HEIGHT))
+
     if keys[pygame.K_a]:
         if count - last_pressP >= 10:
             last_pressP = count
             pen = SC.Pen()
-            pen.build(100, 100, bg, (WIDTH,HEIGHT), WIN, 3)
+            pen.build(100, 100, bg, (WIDTH,HEIGHT), WIN, rotation)
             pens.append(pen)
     
     if keys[pygame.K_w]:
@@ -110,19 +135,15 @@ while run:
          if count - last_pressG >= 10:
              last_pressG = count
              for plt in plots:
-                 for crp in plt.crops:
-                    if crp.name != "Null_Crop":
-                        crp.advanceDay()
+                 plt.newDay()
+             for pn in pens:
+                 pn.newDay()
+                 
     if keys[pygame.K_b]:
-        InvntF.transferInventory("Turnip_Seed", 5, shop, invt, shop=True)
-        InvntF.transferInventory("Carrot_Seed", 5, shop, invt, shop=True)
-    if keys[pygame.K_l]:
-         InvntF.transferInventory("Turnip", 1, invt, shop, shop=True)
-         InvntF.transferInventory("Carrot", 1, invt, shop, shop=True)
-         
+        if count - last_pressP >= 10:
+            last_pressP = count
+            InvntF.inventoryShop(invt, shop, invntindex, WIN, (WIDTH,HEIGHT), shop=True)
     
-        
-        
     if not invnt_open:
         player.controlPlayer((WIDTH, HEIGHT), keys, bg, coll, plots, pens)
         WIN.fill((0,0,0))
@@ -154,8 +175,3 @@ while run:
             invntindex = 0
         InvntF.displayInventory(WIN, invt, invntindex, open=True, player=player)
     pygame.display.update()
-
-         
-         
-
-

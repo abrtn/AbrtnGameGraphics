@@ -6,3 +6,9 @@ _
 _ Animal_Name			Baby					Adult
 Cow						Art\Cow.png				Art\Cow.png
 Lesser_Wyrm				Art\Wyrm.png			Art\Wyrm.png
+_
+_ Item					Icon
+Beef					Art\Beef.png
+Milk					Art\Milk.png
+Spice					Art\Spice.png
+Wyrm_Tooth				Art\Wyrm_Tooth.png

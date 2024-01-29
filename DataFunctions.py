@@ -39,11 +39,12 @@ def getItem(name, num):
             itemData = lineList
             break
     newItem = OC.Item(itemData[0], num)
-    newItem.buyCost = itemData[1]
-    newItem.sellCost = itemData[2]
+    newItem.buyCost = int(itemData[1])
+    newItem.sellCost = int(itemData[2])
     newItem.type = itemData[3]
     ITEM_INDEX[name] = newItem
     return newItem
+
 
 def getAnimal(species, name):
     #if species in ANIMAL_INDEX:
@@ -62,9 +63,9 @@ def getAnimal(species, name):
     newAnml = OC.Animal(anmlData[0], name)
     newAnml.buyCost = int(anmlData[1])
     newAnml.sellCost = int(anmlData[2])
-    newAnml.produced = anmlData[3]
+    newAnml.produced = getItem(anmlData[3], 1)
     newAnml.productionTime = int(anmlData[4])
-    newAnml.onDeath = anmlData[5]
+    newAnml.onDeath = getItem(anmlData[5], 1)
     newAnml.growTime = int(anmlData[6])
     newAnml.predatorRating = int(anmlData[7])
     newAnml.size = int(anmlData[8])

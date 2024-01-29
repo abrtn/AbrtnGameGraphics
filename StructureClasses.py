@@ -30,8 +30,6 @@ class Inventory:
                 return
         self.inventory[self.emptySpots[-1]] = itm
         self.emptySpots.pop()
-        
-    
 
 
 class Plot:
@@ -50,7 +48,8 @@ class Plot:
         
     def newDay(self):
         for i in self.crops:
-            i.advanceDay()
+            if i.name != "Null_Crop":
+                i.advanceDay()
     
     def plant(self, name, i, invnt: Inventory, window):
         #for i in range(len(invnt.inventory)):               #i is item class
@@ -208,7 +207,8 @@ class Pen:
     
     def newDay(self):
         for i in self.animals:
-            i.advanceDay(self.food)
+            if i.name != "Null_Animal":
+                i.advanceDay(self.food)
     
     def addAnimal(self, anmlType, name):
         anml = DF.getAnimal(anmlType, name)
@@ -223,21 +223,26 @@ class Pen:
         
     def milk(self, invnt: Inventory):
         for i in self.animals:
-            if i.produced.name == "Null":
+            if i.produced.name == "Null_Item":
                 continue
             if i.timeLastItem < i.productionTime:
                 continue
             i.timeLastItem = 0
             invnt.addToInvnt(i.produced)
             
-    def butcher(self, name, invnt: Inventory):
-        for i in range(len(self.animals)):
-            if self.animals[i].name == name:
-                if self.animals[i].onDeath.name != "Null":
-                    invnt.addToInvnt(self.animals[i].onDeath)
-                self.names.remove(name)
+    # PROBABLY REWRITE!!!
+    def butcher(self, animal, invnt: Inventory):                # TODO HIGH IMPORTANCE: can only butcher first animal in pen/doesn't stop drawing animals
+        print(len(self.animals))
+        if len(self.animals) == 1:
+            i = 1
+        for i in range(len(self.animals) -1):                   # TODO HIGH IMPORTANCE: out of range when butchering
+            if self.animals[i].name == animal.name:
                 self.animals.pop(i)
-                return
+                break
+        self.names.remove(animal.name)
+        if animal.onDeath.name != "Null_Item":
+            invnt.addToInvnt(animal.onDeath)
+        return
             
     def feed(self, item, invnt: Inventory, count):
         if len(self.food) >= 3:
