@@ -1,44 +1,48 @@
-_Name                Buy_Cost                Sell_Cost               Type
-Null                0                       0                       -
-Wood                10                      8                       Construction
-Stone               10                      8                       Construction
-Mud                 4                       2                       Construction
-Gold                1                       1                       Misc
-Right_Hand_of_the_Warlock   10000000        10000000                Magic
-Left_Hand_of_the_Warlock    10000000        10000000                Magic
+_Name                Buy_Cost                Sell_Cost               Type				Alignment
+Null                0                       0                       -					-
+Wood                10                      8                       Construction		_
+Stone               10                      8                       Construction		_
+Mud                 4                       2                       Construction		_
+Gold                1                       1                       Misc				_
+Right_Hand_of_the_Warlock   10000000        10000000                Magic				_
+Left_Hand_of_the_Warlock    10000000        10000000                Magic				_
 _-----------------------------------------------------Crops
-Turnip              6                       5                       Crop
-Evil_Turnip         6                       4                       Crop
-Cabbage             8                       8                       Crop
-Evil_Cabbage        8                       6                       Crop
-Potato              20                      15                      Crop
-Evil_Potato         20                      12                      Crop
-Carrot              15                      12                      Crop
-Evil_Carrot         15                      10                      Crop
-Tomatos             20                      15                      Crop
-Evil_Tomatos        20                      12                      Crop
-Garlic              24                      20                      Crop
-Evil_Garlic         24                      16                      Crop
-Wheat               4                       4                       Crop
-Evil_Wheat          4                       3                       Crop
+Turnip              6                       5                       Crop				Neutral
+Evil_Turnip         6                       4                       Crop				Evil
+Holy_Turnip         6                       4                       Crop				Holy
+Cabbage             8                       8                       Crop				Neutral
+Evil_Cabbage        8                       6                       Crop				Evil
+Potato              20                      15                      Crop				Neutral
+Evil_Potato         20                      12                      Crop				Evil
+Carrot              15                      12                      Crop				Neutral
+Evil_Carrot         15                      10                      Crop				Evil
+Tomatos             20                      15                      Crop				Neutral
+Evil_Tomatos        20                      12                      Crop				Evil
+Garlic              24                      20                      Crop				Neutral
+Evil_Garlic         24                      16                      Crop				Evil
+Wheat               4                       4                       Crop				Neutral
+Evil_Wheat          4                       3                       Crop				Evil
 _-----------------------------------------------------Seeds
-Turnip_Seed         2                       2                       Seed
-Cabbage_Seed        4                       4                       Seed
-Carrot_Seed			2						2						Seed
+Turnip_Seed         2                       2                       Seed				-
+Cabbage_Seed        4                       4                       Seed				-
+Carrot_Seed			2						2						Seed				-
 _-----------------------------------------------------Boosts
-1.2xFertilizer      10                      10                      Boost
-1.3xFertilizer      15                      15                      Boost
-1.5xFertilizer      20                      20                      Boost
-1.6xEvilFertilizer  50                      50                      Boost
-1.8xEvilFertilizer  60                      60                      Boost
-2.0xEvilFertilizer  70                      70                      Boost
+1.2xFertilizer      10                      10                      Boost				Neutral
+1.3xFertilizer      15                      15                      Boost				Neutral
+1.5xFertilizer      20                      20                      Boost				Neutral
+1.6xEvilFertilizer  50                      50                      Boost				Evil
+1.8xEvilFertilizer  60                      60                      Boost				Evil
+2.0xEvilFertilizer  70                      70                      Boost				Evil
+1.6xHolyFertilizer  50                      50                      Boost				Holy
+1.8xHolyFertilizer  60                      60                      Boost				Holy
+2.0xHolyFertilizer  70                      70                      Boost				Holy
 _-----------------------------------------------------Animals
-Milk                40                      25                      Ingredient
-Beef                50                      30                      Food
-Wool                45                      30                      Ingredient
-Stardust            550                     500                     Ingredient
-Powdered_horn       1200                    1000                    Ingredient
-Scales              550                     500                     Ingredient
-Dragon_skin         2000                    1800                    Ingredient
-Wyrm_Tooth			200						180						Ingredient
-Spice				50						45						Ingredient
+Milk                40                      25                      Food				-
+Beef                50                      30                      Meat				Neutral
+Wool                45                      30                      Ingredient			-
+Stardust            550                     500                     Ingredient			-
+Powdered_horn       1200                    1000                    Ingredient			-
+Scales              550                     500                     Ingredient			-
+Dragon_skin         2000                    1800                    Ingredient			-
+Wyrm_Tooth			200						180						Ingredient			-
+Spice				50						45						Ingredient			-

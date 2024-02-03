@@ -3,7 +3,7 @@ _ Crop_Name				Seed					Sprout					Grown
 Turnip					Art\Turnip_Seed.png		Art\Turnip_Sprout.png	Art\Turnip_Grown.png
 Carrot					Art\Carrot_Seed.png		Art\Carrot_Sprout.png	Art\Carrot_Grown.png
 _
-_ Animal_Name			Baby					Adult
+_ Animal_Name			Baby					Adult					AdultEvil					AdultHoly
 Cow						Art\Cow.png				Art\Cow.png
 Lesser_Wyrm				Art\Wyrm.png			Art\Wyrm.png
 _

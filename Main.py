@@ -13,11 +13,15 @@ import Collisions as C
 # NEXT TODO: Fix butcher function and feeding animals #
 #######################################################
 #######################################################
-
+# Add in dictionaries
+# Use .convert() after loading each image
 WIDTH, HEIGHT = 1000, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game Window")
 clock = pygame.time.Clock()
+
+pygame.font.init()
+textFont = pygame.font.SysFont('Times New Roman', 20)
 
 run = True
 last_pressG = 0
@@ -50,6 +54,7 @@ while run:
             if event.type == pygame.QUIT:
                 run = False
                 break
+                
                 
     keys = pygame.key.get_pressed()
 

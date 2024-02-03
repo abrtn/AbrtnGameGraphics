@@ -119,7 +119,6 @@ class Pen:
     
     def __init__(self):
         self.animals = []
-        self.food = []
         self.capacity = 5
         self.spaceFilled = 0
         self.names = set()
@@ -206,9 +205,9 @@ class Pen:
         self.y = coords[1]
     
     def newDay(self):
-        for i in self.animals:
-            if i.name != "Null_Animal":
-                i.advanceDay(self.food)
+        for i in range(len(self.animals)):
+            if self.animals[i].name != "Null_Animal":
+                self.animals[i].advanceDay()
     
     def addAnimal(self, anmlType, name):
         anml = DF.getAnimal(anmlType, name)
@@ -223,15 +222,15 @@ class Pen:
         
     def milk(self, invnt: Inventory):
         for i in self.animals:
-            if i.produced.name == "Null_Item":
+            if i.produced[i.dataIndex].name == "Null_Item":
                 continue
             if i.timeLastItem < i.productionTime:
                 continue
             i.timeLastItem = 0
-            invnt.addToInvnt(i.produced)
+            invnt.addToInvnt(i.produced[i.dataIndex])
             
     # PROBABLY REWRITE!!!
-    def butcher(self, animal, invnt: Inventory):                # TODO HIGH IMPORTANCE: can only butcher first animal in pen/doesn't stop drawing animals
+    def butcher(self, animal, invnt: Inventory, shop=False):    # TODO HIGH IMPORTANCE: can only butcher first animal in pen/doesn't stop drawing animals
         print(len(self.animals))
         if len(self.animals) == 1:
             i = 1
@@ -240,22 +239,11 @@ class Pen:
                 self.animals.pop(i)
                 break
         self.names.remove(animal.name)
-        if animal.onDeath.name != "Null_Item":
-            invnt.addToInvnt(animal.onDeath)
+        if shop:
+            invnt.gold += animal.sellCost[animal.dataIndex]
+        elif animal.onDeath[animal.dataIndex].name != "Null_Item":
+            invnt.addToInvnt(animal.onDeath[animal.dataIndex])
         return
-            
-    def feed(self, item, invnt: Inventory, count):
-        if len(self.food) >= 3:
-            return
-        for i in invnt.Inventory:
-            if i.name == item:
-                if i.count < count:
-                    count = i.count
-                i.count -= count
-                itm = DF.getItem(item, count)
-                self.food.append(itm)
-                invnt.clearEmpty()
-                return
             
     def checkColl(self, newX, newY, direction):
         # needs to take in abs coords

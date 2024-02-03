@@ -30,7 +30,7 @@ def getItem(name, num):
     #    newItem = ITEM_INDEX[name]
     #    return newItem
     f = open("RefData\Items.txt", 'r')
-    itemData = ["Null_Item", 0, 0, '-']
+    itemData = ["Null_Item", 0, 0, '-', '-']
     for line in f:
         if line[0] == '_':
             continue
@@ -42,6 +42,7 @@ def getItem(name, num):
     newItem.buyCost = int(itemData[1])
     newItem.sellCost = int(itemData[2])
     newItem.type = itemData[3]
+    newItem.alignment = itemData[4]
     ITEM_INDEX[name] = newItem
     return newItem
 
@@ -61,14 +62,20 @@ def getAnimal(species, name):
             anmlData = lineList
             break
     newAnml = OC.Animal(anmlData[0], name)
-    newAnml.buyCost = int(anmlData[1])
-    newAnml.sellCost = int(anmlData[2])
-    newAnml.produced = getItem(anmlData[3], 1)
+    newAnml.buyCost = list(map(int, anmlData[1].split('_')))
+    newAnml.sellCost = list(map(int, anmlData[2].split('_')))
+    produced = anmlData[3].split('_')
+    newAnml.produced = [getItem(itm, 1) for itm in produced]
     newAnml.productionTime = int(anmlData[4])
-    newAnml.onDeath = getItem(anmlData[5], 1)
+    produced = anmlData[5].split('_')
+    newAnml.onDeath = [getItem(itm, 1) for itm in produced]
     newAnml.growTime = int(anmlData[6])
     newAnml.predatorRating = int(anmlData[7])
     newAnml.size = int(anmlData[8])
     ANIMAL_INDEX[species] = newAnml
+    if newAnml.predatorRating == 0 or newAnml.predatorRating == 1:
+        newAnml.eats = "Crop"
+    elif newAnml.predatorRating == 2:
+        newAnml.eats = "Meat"
     return newAnml
 

@@ -29,8 +29,7 @@ def numToDisplay(num, pos, WIN):
         WIN.blit(NUMBERS[num[i]], (x, pos[1]))
         x -= NUM_WIDTH
 
-
-def transferInventory(itmIndex: str, count, i1: SC.Inventory, i2: SC.Inventory, shop=False):
+def transferInventory(itmIndex, count, i1: SC.Inventory, i2: SC.Inventory, shop=False):
     # transfer from i1 to i2
     # if shop, also change gold
     # buying/selling will have shop True, chests will be False
@@ -39,10 +38,10 @@ def transferInventory(itmIndex: str, count, i1: SC.Inventory, i2: SC.Inventory, 
         return    
             
     if shop:
-        if i2.gold is not None and i2.gold > int(i1.inventory[itmIndex].buyCost):          #TODO can buy to negative amounts
+        if i2.gold is not None and i2.gold > int(i1.inventory[itmIndex].buyCost):
             valid_move = True
         else:
-            valid_move = True
+            valid_move = False
     else:
         valid_move = True
     if len(i2.emptySpots) == 0:
@@ -167,7 +166,7 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
     clock = pygame.time.Clock()
     animal = None
     print(len(pen.animals))
-    # deal with rotation for drawing pen
+    anmIndex = len(pen.animals)
     while True:
         clock.tick(20)
         count += 1
@@ -177,19 +176,36 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
             break
         # butcher animal
         # feed animal
-        if pygame.mouse.get_pressed()[0]:
-            if count - last_mouse >= 10:
-                last_mouse = count
-                coords = pygame.mouse.get_pos()
-                print(coords)
-                animal = getPenAnimal(pen, coords)
-                if animal is not None:
-                    print(animal.species)
-        if keys[pygame.K_b]:
-            if animal is None:
-                continue
-            pen.butcher(animal, invnt)
-            animal = None
+        if animal is None:
+            if pygame.mouse.get_pressed()[0]:
+                if count - last_mouse >= 10:
+                    last_mouse = count
+                    coords = pygame.mouse.get_pos()
+                    animal = getPenAnimal(pen, coords)[0]
+        
+        if animal is not None:
+            if pygame.mouse.get_pressed()[0]:
+                if count - last_mouse >= 10:
+                    last_mouse = count
+                    coords = pygame.mouse.get_pos()
+                    print(coords)
+                    if coords[0] < 450:
+                        item = getItemClick(invnt, coords, invntindex)[0]
+                        if animal.feed(invnt.inventory[item]):
+                            invnt.inventory[item].count -= 1
+                            invnt.clearEmpty()
+                    elif coords[1] > 550 and coords[1] < 580:
+                        if coords[0] > 540 and coords[0] < 660:
+                            pen.butcher(animal, invnt, shop=True)
+                            animal = None
+                            print("Sell")
+                        elif coords[0] > 740 and coords[0] < 860:
+                            pen.butcher(animal, invnt)
+                            animal = None
+                            print("Butcher")
+                        
+                        
+            
         if keys[pygame.K_DOWN]:
             invntindex += 1
         if keys[pygame.K_UP]:
@@ -198,8 +214,14 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
             invntindex = 20
         elif invntindex < 0:
             invntindex = 0
+        if keys[pygame.K_ESCAPE]:
+            animal = None
+
         displayInventory(WIN, invnt, invntindex, open=True)
-        pen.draw(WIN, None, windowSize, 600, 200, rotation=1)
+        if animal is None:
+            pen.draw(WIN, None, windowSize, 600, 200, rotation=1)
+        else:
+            displayAnimal(animal, WIN, 600, 200)
         pygame.display.update()
     
 def getPenAnimal(pen, mousePos):
@@ -209,13 +231,53 @@ def getPenAnimal(pen, mousePos):
         return None
     space = (mousePos[1] - 210) // 72 + 1
     size = 0
+    num = 0
     for i in pen.animals:
         size += i.size
         if size >= space:
             if i.name != "Null_Animal":
-                return i
+                return i, num
             return None
+        num += 1
     return None
+
+def displayAnimal(animal: OC.Animal, window, x, y):                         # TODO display item ready and alignment?
+    spacing = 150
+    pygame.font.init()
+    textFont = pygame.font.SysFont('Times New Roman', 20)
+    # draw animal
+    xPerAnimal = 134 - (52*animal.size+(20*(animal.size-1)))/2
+    animal.draw(window, 0, 0, 0, x=x + xPerAnimal, y=y + 40)
+    # display name if exists
+    if animal.name[0] != '_':
+        name = textFont.render(animal.name, False, (0,0,0))
+        window.blit(name, (x, y))
+    # display species, age, last fed
+    species = textFont.render("Species:", False, (0,0,0))
+    anmSpecies = textFont.render(animal.species, False, (0,0,0))
+    age = textFont.render("Age:", False, (0,0,0))
+    old = "Adult"
+    if not animal.grown:
+        old = "Young"
+    anmAge = textFont.render(old, False, (0,0,0))
+    lastFed = textFont.render("Days since last fed:", False, (0,0,0))
+    timeLastFed = textFont.render(str(animal.timeLastFed), False, (0,0,0))
+    window.blit(species, (x-50, y+200))
+    window.blit(anmSpecies, (x+spacing, y+200))
+    window.blit(age, (x-50, y+240))
+    window.blit(anmAge, (x+spacing, y+240))
+    window.blit(lastFed, (x-50, y+280))
+    window.blit(timeLastFed, (x+spacing, y+280))
+    # Option to butcher, feed, sell
+    sell = textFont.render("Sell", False, (0,0,0))
+    butcher = textFont.render("Butcher", False, (0,0,0))
+    window.blit(sell, (x-50, y+360))
+    window.blit(butcher, (x+spacing, y+360))
+    if animal.food is not None:
+        image = pygame.image.load("Art\\" + animal.food[0] + "_Grown.png")
+        window.blit(image, (x+100, y+420))
+        numToDisplay(animal.food[1], (x+182,y+420), window)
+    
 
 def inventoryShop(invnt: SC.Inventory, invnt2: SC.Inventory, invntindex, WIN, windowsize, shop=False):
     pygame.mouse.set_visible(True)
