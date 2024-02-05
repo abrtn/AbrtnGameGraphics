@@ -10,11 +10,11 @@ import Collisions as C
 
 #######################################################
 #######################################################
-# NEXT TODO: Fix butcher function and feeding animals #
+# NEXT TODO: Alignments                               #
 #######################################################
 #######################################################
 # Add in dictionaries
-# Use .convert() after loading each image
+# Use .convert() after loading each image?
 WIDTH, HEIGHT = 1000, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game Window")

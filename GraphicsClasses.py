@@ -110,7 +110,7 @@ class Plot:
         self.width = 260
         self.height = 260
         self.image = "Art/Plot.png"
-        self.crops = []
+        self.crops = [None] * 25
         self.cropNum = 0
         self.cropStart = [self.x + 35, self.y + 30]
         self.step = 35
@@ -185,12 +185,10 @@ class Crop:
         crop = pygame.transform.scale(crop, (self.width,self.height))
         self.crop = crop
         self.loc = [-100, -100]
-        self.cropNumInPlot = 0
         self.posInPlot = (0,0)
         
-    def plant(self, window, plot: Plot):
-        self.cropNumInPlot = plot.cropNum
-        self.posInPlot = plot.cropPos[plot.next_empty]
+    def plant(self, window, posInPlot, plot: Plot):
+        self.posInPlot = plot.cropPos[-posInPlot-1]
         #plot.cropPos.pop()
         self.loc[0] = plot.cropStart[0] + (plot.step * self.posInPlot[0])
         self.loc[1] = plot.cropStart[1] + (plot.step * self.posInPlot[1])

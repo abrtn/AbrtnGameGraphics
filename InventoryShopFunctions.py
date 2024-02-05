@@ -38,7 +38,7 @@ def transferInventory(itmIndex, count, i1: SC.Inventory, i2: SC.Inventory, shop=
         return    
             
     if shop:
-        if i2.gold is not None and i2.gold > int(i1.inventory[itmIndex].buyCost):
+        if i2.gold is not None and i2.gold >= int(i1.inventory[itmIndex].buyCost):
             valid_move = True
         else:
             valid_move = False
@@ -125,6 +125,9 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
     last_mouse = 10
     keys = pygame.key.get_pressed()
     clock = pygame.time.Clock()
+    selectPos = None
+    slct = pygame.image.load("Art\Select.png")
+    crp = None
     while True:
         clock.tick(20)
         count += 1
@@ -141,9 +144,18 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
                 last_mouse = count
                 coords = pygame.mouse.get_pos()
                 print(coords)
-                item = getItemClick(invnt, coords, invntindex)
-                if item is not None and invnt.inventory[item[0]].type == "Seed":
-                    plot.plant(invnt.inventory[item[0]].name, item[0], invnt, WIN)
+                if coords[0] < 450:
+                    item = getItemClick(invnt, coords, invntindex)
+                    if item is not None and invnt.inventory[item[0]].type == "Seed" and crp is not None:
+                        plot.plant(invnt.inventory[item[0]].name, item[0], crp, invnt, WIN)
+                        print(crp)
+                else:
+                    crp = clickCrop(plot, coords)
+                    if crp is not None:
+                        selectedCrop = plot.crops[crp]
+                        selectPos = (635 + ((crp)%5)*35, 380 + ((crp)//5)*35)
+        if keys[pygame.K_ESCAPE]:
+            selectPos = None
         if keys[pygame.K_DOWN]:
             invntindex += 1
         if keys[pygame.K_UP]:
@@ -155,8 +167,22 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
         WIN.fill((0,0,0)) 
         displayInventory(WIN, invnt, invntindex, open=True)
         plot.draw(WIN, None, windowSize, 600, 350)
+        if selectPos is not None:
+            WIN.blit(slct, selectPos)
         pygame.display.update()
     pygame.mouse.set_visible(False)
+    
+def clickCrop(plot, coords):
+    if coords[0] > 860 or coords[0] < 635:
+        return None
+    elif coords[1] > 610 or coords[1] < 380:
+        return None
+    x = (coords[0] - 635)//35
+    y = (coords[1] - 380)//35
+    if x >=5 or y >=5:
+        return None
+    print(x+y*5)
+    return x+y*5
     
 def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
     pygame.mouse.set_visible(True)
@@ -181,7 +207,7 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
                 if count - last_mouse >= 10:
                     last_mouse = count
                     coords = pygame.mouse.get_pos()
-                    animal = getPenAnimal(pen, coords)[0]
+                    animal = getPenAnimal(pen, coords)
         
         if animal is not None:
             if pygame.mouse.get_pressed()[0]:
@@ -191,16 +217,16 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
                     print(coords)
                     if coords[0] < 450:
                         item = getItemClick(invnt, coords, invntindex)[0]
-                        if animal.feed(invnt.inventory[item]):
+                        if animal[0].feed(invnt.inventory[item]):
                             invnt.inventory[item].count -= 1
                             invnt.clearEmpty()
                     elif coords[1] > 550 and coords[1] < 580:
                         if coords[0] > 540 and coords[0] < 660:
-                            pen.butcher(animal, invnt, shop=True)
+                            pen.butcher(animal[0], invnt, shop=True)
                             animal = None
                             print("Sell")
                         elif coords[0] > 740 and coords[0] < 860:
-                            pen.butcher(animal, invnt)
+                            pen.butcher(animal[0], invnt)
                             animal = None
                             print("Butcher")
                         
@@ -221,7 +247,7 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
         if animal is None:
             pen.draw(WIN, None, windowSize, 600, 200, rotation=1)
         else:
-            displayAnimal(animal, WIN, 600, 200)
+            displayAnimal(animal[0], WIN, 600, 200)
         pygame.display.update()
     
 def getPenAnimal(pen, mousePos):

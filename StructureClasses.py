@@ -51,17 +51,16 @@ class Plot:
             if i.name != "Null_Crop":
                 i.advanceDay()
     
-    def plant(self, name, i, invnt: Inventory, window):
+    def plant(self, name, i, j, invnt: Inventory, window):
         #for i in range(len(invnt.inventory)):               #i is item class
         #    if invnt.inventory[i].name == name: #+ "_Seed":                
-                #TODO plant multiple at once
-                if self.numCrops < self.capacity:
-                    self.crops[self.emptySpots[-1]] = DF.getCrop(name.split('_')[0])
+                if self.numCrops < self.capacity and self.crops[j].name == "Null_Crop":
+                    self.crops[j] = DF.getCrop(name.split('_')[0])
 
-                    self.plot.crops.append(self.crops[self.emptySpots[-1]].crop)
+                    self.plot.crops[j] = self.crops[j].crop
                     
-                    self.plot.next_empty = self.emptySpots[-1]
-                    self.crops[self.emptySpots[-1]].plant(window, self.plot)
+                    #self.plot.next_empty = self.emptySpots[-1]
+                    self.crops[j].plant(window, j, self.plot)
 
                     self.emptySpots.pop()
                     self.numCrops += 1
@@ -229,16 +228,12 @@ class Pen:
             i.timeLastItem = 0
             invnt.addToInvnt(i.produced[i.dataIndex])
             
-    # PROBABLY REWRITE!!!
-    def butcher(self, animal, invnt: Inventory, shop=False):    # TODO HIGH IMPORTANCE: can only butcher first animal in pen/doesn't stop drawing animals
-        print(len(self.animals))
-        if len(self.animals) == 1:
-            i = 1
-        for i in range(len(self.animals) -1):                   # TODO HIGH IMPORTANCE: out of range when butchering
+    def butcher(self, animal, invnt: Inventory, shop=False):
+        for i in range(len(self.animals)):
             if self.animals[i].name == animal.name:
                 self.animals.pop(i)
+                self.names.remove(animal.name)
                 break
-        self.names.remove(animal.name)
         if shop:
             invnt.gold += animal.sellCost[animal.dataIndex]
         elif animal.onDeath[animal.dataIndex].name != "Null_Item":

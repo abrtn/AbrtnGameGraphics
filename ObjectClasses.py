@@ -18,8 +18,8 @@ class Crop:
         self.images = GCF.getImage(name)
         self.imageIndex = 0
         
-    def plant(self, window, plot):
-        self.crop.plant(window, plot)
+    def plant(self, window, j, plot):
+        self.crop.plant(window, j, plot)
         
     def harvest(self, plotG):
         self.crop.harvest(plotG)

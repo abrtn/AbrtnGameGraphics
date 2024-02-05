@@ -44,5 +44,5 @@ Stardust            550                     500                     Ingredient		
 Powdered_horn       1200                    1000                    Ingredient			-
 Scales              550                     500                     Ingredient			-
 Dragon_skin         2000                    1800                    Ingredient			-
-Wyrm_Tooth			200						180						Ingredient			-
+WyrmTooth			200						180						Ingredient			-
 Spice				50						45						Ingredient			-

@@ -3,7 +3,7 @@ Null                0                           0                       -       
 Sheep               1000_1500_1500              1500_2000_2000          Wool_Wool_Wool          5                           -_-_-								14                  0				1
 Cow                 1500_2000_2000              2000_2800_2800          Milk_Milk_Milk          3                           Beef_Beef_Beef						14                  0				1
 Horse               2000                        2200                    -                       0                           -									21                  0				1
-Unicorn             15000                       30000                   Stardust                21                          Powdered_horn						28                  1				2
-Dragonlet           30000                       45000                   Scales                  28                          Dragon_skin							28                  2				3
-Evil_Dragonlet      30000                       45000                   Scales                  28                          Dragon_skin							28                  2				3
-Lesser_Wyrm			20000_20000_20000			30000_30000_30000		Spice_Spice_Spice		28							Wyrm_Tooth_Wyrm_Tooth_Wyrm_Tooth	28					2				4
+Unicorn             15000                       30000                   Stardust                21                          PowderedHorn						28                  1				2
+Dragonlet           30000                       45000                   Scales                  28                          DragonSkin							28                  2				3
+Evil_Dragonlet      30000                       45000                   Scales                  28                          DragonSkin							28                  2				3
+Lesser_Wyrm			20000_20000_20000			30000_30000_30000		Spice_Spice_Spice		28							WyrmTooth_WyrmTooth_WyrmTooth		28					2				4
