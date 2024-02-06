@@ -40,8 +40,10 @@ def transferInventory(itmIndex, count, i1: SC.Inventory, i2: SC.Inventory, shop=
     if shop:
         if i2.gold is not None and i2.gold >= int(i1.inventory[itmIndex].buyCost):
             valid_move = True
-        else:
+        elif i2.gold is not None:
             valid_move = False
+        else:
+            valid_move = True
     else:
         valid_move = True
     if len(i2.emptySpots) == 0:
@@ -74,7 +76,7 @@ def displayInventory(WIN, invnt, startindex=0, player=None, open=False, invnt2=N
     for i in range(startindex, startindex + 10):
         if invnt.inventory[i].name != "Null_Item":
             try:                        # TODO fix when adding item icons
-                item = pygame.image.load("Art\\" + invnt.inventory[i].name + ".png")
+                item = invnt.inventory[i].image
             except:
                 item = pygame.image.load("Art\\" + invnt.inventory[i].name + "_Grown.png")
             WIN.blit(item, (110, y))
@@ -89,7 +91,7 @@ def displayInventory(WIN, invnt, startindex=0, player=None, open=False, invnt2=N
         for i in range(len(invnt2.inventory)):
             if invnt2.inventory[i].name != "Null_Item":
                 try:                        # TODO fix when adding item icons
-                    item = pygame.image.load("Art\\" + invnt2.inventory[i].name + ".png")
+                    item = invnt2.inventory[i].image
                 except:
                     item = pygame.image.load("Art\\" + invnt2.inventory[i].name + "_Grown.png")
                 WIN.blit(item, (520, y))
@@ -146,9 +148,12 @@ def inventoryPlant(invnt: SC.Inventory, plot, invntindex, WIN, windowSize):
                 print(coords)
                 if coords[0] < 450:
                     item = getItemClick(invnt, coords, invntindex)
-                    if item is not None and invnt.inventory[item[0]].type == "Seed" and crp is not None:
-                        plot.plant(invnt.inventory[item[0]].name, item[0], crp, invnt, WIN)
-                        print(crp)
+                    if item is not None and crp is not None:
+                        if plot.crops[crp].name == "Null_Crop" and invnt.inventory[item[0]].type == "Seed":
+                            plot.plant(invnt.inventory[item[0]].name, item[0], crp, invnt, WIN)
+                            print(crp)
+                        if plot.crops[crp].name != "Null_Crop" and invnt.inventory[item[0]].type == "Boost":
+                            plot.crops[crp].boost(invnt, item[0])
                 else:
                     crp = clickCrop(plot, coords)
                     if crp is not None:
@@ -228,9 +233,7 @@ def inventoryAnimal(invnt: SC.Inventory, pen, invntindex, WIN, windowSize):
                         elif coords[0] > 740 and coords[0] < 860:
                             pen.butcher(animal[0], invnt)
                             animal = None
-                            print("Butcher")
-                        
-                        
+                            print("Butcher")                      
             
         if keys[pygame.K_DOWN]:
             invntindex += 1
@@ -269,6 +272,7 @@ def getPenAnimal(pen, mousePos):
 
 def displayAnimal(animal: OC.Animal, window, x, y):                         # TODO display item ready and alignment?
     spacing = 150
+    print(animal.alignment)
     pygame.font.init()
     textFont = pygame.font.SysFont('Times New Roman', 20)
     # draw animal
@@ -300,8 +304,7 @@ def displayAnimal(animal: OC.Animal, window, x, y):                         # TO
     window.blit(sell, (x-50, y+360))
     window.blit(butcher, (x+spacing, y+360))
     if animal.food is not None:
-        image = pygame.image.load("Art\\" + animal.food[0] + "_Grown.png")
-        window.blit(image, (x+100, y+420))
+        window.blit(animal.food[3], (x+100, y+420))
         numToDisplay(animal.food[1], (x+182,y+420), window)
     
 

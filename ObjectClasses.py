@@ -1,6 +1,4 @@
-from itertools import filterfalse
 import pygame
-import StructureClasses as SC
 import GraphicsClasses as GC
 import DataFunctions as DF
 import GraphicsClassFunctions as GCF
@@ -13,7 +11,7 @@ class Crop:
         self.timeInGround = 0
         self.boostMultiplier = 1
         self.grown = False
-        self.evil = False
+        self.alignment = "Neutral"
         self.crop = GC.Crop(name)
         self.images = GCF.getImage(name)
         self.imageIndex = 0
@@ -34,6 +32,30 @@ class Crop:
             self.crop.grow()
             self.grown = True
             
+    def boost(self, invnt, i):
+        mult = float(invnt.inventory[i].name[0:3])
+        if mult < 1.5:
+            alnmt = "Neutral"
+        else:
+            alnmt = invnt.inventory[i].name[4:8]
+        if self.boostMultiplier >= mult and (alnmt == "Neutral" or alnmt == self.alignment):
+            return
+        if self.boostMultiplier < mult:
+            self.boostMultiplier = mult
+        if alnmt == "Neutral":
+            return
+        elif self.alignment == "Neutral":
+            self.alignment = alnmt
+        else:
+            self.alignment = "Neutral"
+            
+    def changeAlignment(self, newAlnmnt):
+        if self.alignment != "Neutral":
+            self.name = self.name[:5]
+        if newAlnmnt != "Neutral":
+            self.name = newAlnmnt + '_' + self.name
+        self.images = GCF.getImage(self.name)
+            
     def draw(self, window, plot):
         self.crop.draw(window, plot)
     
@@ -47,6 +69,7 @@ class Item:
         self.sellCost = 0
         self.type = ""
         self.alignment = "-"
+        self.image = pygame.image.load(GCF.getImage(name, bypassTo="Item")[1])
         
 
 NULL_ITEM = DF.getItem("Null", 1)
@@ -91,22 +114,25 @@ class Animal:
         self.timeLastItem += 2
 
         # check if alignment changes
-        if not self.grown:
-            self.food[1] -= 1
-            if self.food[1] == 0:
-                self.food = None
-            return
+        #if not self.grown:
+        #    self.food[1] -= 1
+        #    if self.food[1] == 0:
+        #        self.food = None
+            #return
         
         if self.alignment != self.food[2]:                  # TODO get image change when alignment changes
             if self.alignment != "Neutral" and self.food[2] != "Neutral":
                 self.alignment = "Neutral"
-                #self.imageIndex = 1
+                self.imageIndex = 2
+                self.animal = pygame.image.load(self.images[self.imageIndex])
             elif self.alignment == "Neutral":
                 self.alignment = self.food[2]
-                #if self.alignment == "Evil":
-                #    self.imageIndex = 2
-                #else:
-                #    self.imageIndex = 3
+                if self.alignment == "Evil":
+                    self.imageIndex = 3
+                    self.animal = pygame.image.load(self.images[self.imageIndex])
+                else:
+                    self.imageIndex = 4
+                    self.animal = pygame.image.load(self.images[self.imageIndex])
             
 
         self.food[1] -= 1
@@ -135,13 +161,14 @@ class Animal:
         WIN.blit(animal, coords)
     
     def feed(self, item: Item):
+        print("_" + item.alignment)
         if self.food is not None:
             if item.name == self.food[0] and self.food[1] < 9:
                 self.food[1] += 1
                 return True
             return False
         if self.eats == item.type:
-            self.food = [item.name, 1, item.alignment]
+            self.food = [item.name, 1, item.alignment, item.image]
             return True
         return False
                 

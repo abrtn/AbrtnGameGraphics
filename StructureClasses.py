@@ -54,7 +54,7 @@ class Plot:
     def plant(self, name, i, j, invnt: Inventory, window):
         #for i in range(len(invnt.inventory)):               #i is item class
         #    if invnt.inventory[i].name == name: #+ "_Seed":                
-                if self.numCrops < self.capacity and self.crops[j].name == "Null_Crop":
+                if self.numCrops < self.capacity:
                     self.crops[j] = DF.getCrop(name.split('_')[0])
 
                     self.plot.crops[j] = self.crops[j].crop
@@ -62,7 +62,7 @@ class Plot:
                     #self.plot.next_empty = self.emptySpots[-1]
                     self.crops[j].plant(window, j, self.plot)
 
-                    self.emptySpots.pop()
+                    #self.emptySpots.pop()
                     self.numCrops += 1
                     invnt.inventory[i].count -= 1
                     invnt.clearEmpty()
@@ -89,12 +89,6 @@ class Plot:
                 self.numCrops -= 1
                 self.emptySpots.append(i)
                 self.emptySpots.sort()
-                
-    
-    def boost(self, mult):              #TODO
-        for i in self.crops:
-            if i.boostMultiplier < mult:
-                i.boostMultiplier = mult
 
     def checkColl(self, newX, newY, direction):
         # needs to take in abs coords

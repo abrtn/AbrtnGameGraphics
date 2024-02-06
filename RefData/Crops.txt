@@ -1,9 +1,15 @@
 _Name               Time_to_Grow(days)
 Null                0
 Turnip              7
+Evil_Turnip			7
+Holy_Turnip			7
 Cabbage             7
+Evil_Cabbage		7
+Holy_Cabbage		7
 Potato              14
 Carrot              14
+Evil_Carrot			14
+Holy_Carrot			14
 Tomatos             14
 Garlic              28
 Wheat               14

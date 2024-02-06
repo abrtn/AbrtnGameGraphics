@@ -17,6 +17,7 @@ class Location:
         self.plots = []
         self.shops = []
         self.characters = []
+        self.shopModifier = 1
         
     def drawBeforePlayer(self, WIN, size):
         WIN.fill((0,0,0))
@@ -26,7 +27,8 @@ class Location:
         for i in self.pens:
             i.draw(WIN, self.background, size)
     
-    def drawAfterPlayer(self, WIN, size):
-        self.collisions.drawObstacles(self.background, WIN)
+    def drawAfterPlayer(self, WIN, size, plyr):
+        self.collisions.drawObstacles(self.background, WIN, size, plyr)
+        
         
         

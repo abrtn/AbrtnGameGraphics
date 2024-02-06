@@ -2,11 +2,18 @@ import pygame
 import GraphicsClasses as GC
 import BackgroundMap as bg
 
-def getImage(name: str):
+def getImage(name: str, bypassTo=None):
     f = open("refArt.txt", 'r')
     artList = []
     next(f)
+    bypassMet = True
+    if bypassTo is not None:
+        bypassMet = False
     for line in f:
+        if bypassMet == False:
+            if line[2:len(bypassTo) + 2] == bypassTo:
+                bypassMet = True
+            continue
         if(line[0] == '_'):
             continue
         artList = line.split()
@@ -14,7 +21,7 @@ def getImage(name: str):
             print(artList)
             f.close()
             return artList
-    return [name, "Art\Turnip_Grown.png", "Art\Turnip_Grown.png"]
+    return ["NULL", "Art\Turnip_Grown.png", "Art\Turnip_Grown.png"]
 
 
 def absToRelCoords(absCoords, background: bg.Background, windowSize=()):

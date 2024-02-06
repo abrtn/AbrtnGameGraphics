@@ -4,7 +4,7 @@ Turnip					Art\Turnip_Seed.png		Art\Turnip_Sprout.png	Art\Turnip_Grown.png
 Carrot					Art\Carrot_Seed.png		Art\Carrot_Sprout.png	Art\Carrot_Grown.png
 _
 _ Animal_Name			Baby					Adult					AdultEvil					AdultHoly
-Cow						Art\Cow.png				Art\Cow.png
+Cow						Art\Cow.png				Art\Cow.png				Art\EvilCow.png				Art\HolyCow.png
 Lesser_Wyrm				Art\Wyrm.png			Art\Wyrm.png
 _
 _ Item					Icon
@@ -12,3 +12,9 @@ Beef					Art\Beef.png
 Milk					Art\Milk.png
 Spice					Art\Spice.png
 Wyrm_Tooth				Art\Wyrm_Tooth.png
+Turnip					Art\Turnip_Grown.png
+Turnip_Seed				Art\Turnip_Seed.png
+Carrot					Art\Carrot.png
+Carrot_Seed				Art\Carrot_Seed.png
+Evil_Carrot				Art\EvilCarrot.png
+Holy_Carrot				Art\HolyCarrot.png

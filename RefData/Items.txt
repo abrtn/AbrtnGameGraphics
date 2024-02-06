@@ -16,6 +16,7 @@ Potato              20                      15                      Crop				Neut
 Evil_Potato         20                      12                      Crop				Evil
 Carrot              15                      12                      Crop				Neutral
 Evil_Carrot         15                      10                      Crop				Evil
+Holy_Carrot			15						10						Crop				Holy
 Tomatos             20                      15                      Crop				Neutral
 Evil_Tomatos        20                      12                      Crop				Evil
 Garlic              24                      20                      Crop				Neutral

@@ -7,12 +7,13 @@ import StructureClasses as SC
 import DataFunctions as DF
 import InventoryShopFunctions as InvntF
 import Collisions as C
+import Locations as L
 
-#######################################################
-#######################################################
-# NEXT TODO: Alignments                               #
-#######################################################
-#######################################################
+###########################################################
+###########################################################
+# NEXT TODO: Alignments, select box for items, fertilizer #
+###########################################################
+###########################################################
 # Add in dictionaries
 # Use .convert() after loading each image?
 WIDTH, HEIGHT = 1000, 800
@@ -31,16 +32,23 @@ last_mouse = 0
 count = 0
 player = GC.Player(0,0,80,80)
 bg = BGM.Background("Test", 0, 0)
-plots = []
-pens = []
-shop = SC.Inventory()
-shop.addToInvnt(DF.getItem("Turnip_Seed", 50))
-shop.addToInvnt(DF.getItem("Carrot_Seed", 50))
-shop.addToInvnt(DF.getItem("Turnip", 50))
-shop.addToInvnt(DF.getItem("Carrot", 50))
+
+locations = {"Field" : L.Location()}
+curr_loc = locations["Field"]
+
+# TODO Initialize location background, shops, collisions in separate file/function
+curr_loc.background = BGM.Background("Test", 0, 0)
+curr_loc.shops.append(SC.Inventory())
+curr_loc.shops[0].addToInvnt(DF.getItem("Turnip_Seed", 50))
+curr_loc.shops[0].addToInvnt(DF.getItem("Carrot_Seed", 50))
+curr_loc.shops[0].addToInvnt(DF.getItem("Turnip", 50))
+curr_loc.shops[0].addToInvnt(DF.getItem("Carrot", 50))
+curr_loc.shops[0].addToInvnt(DF.getItem("Evil_Carrot", 50))
+curr_loc.shops[0].addToInvnt(DF.getItem("Holy_Carrot", 50))
+curr_loc.collisions = C.Collision()
+
 invt = SC.Inventory(50)
 invnt_open = False
-coll = C.Collision()
 check = False
 pygame.mouse.set_visible(False)
 invntindex = 0
@@ -61,17 +69,17 @@ while run:
     if keys[pygame.K_s]:
         if count - last_pressP >= 10:
             last_pressP = count
-            coll.obsList = [None] * 10
-            coll.tempCollPlacements = set([(100,100), (200,200), (300,300), (400,400), (500,500), (600,600), (700,700), (800,800), (900,900), (1000,1000), (200, 100), (300,100), (500,600), (100,400), (200, 600)])
-            coll.tempCollPositions  = set()
-            coll.generate()
+            curr_loc.collisions.obsList = [None] * 10
+            curr_loc.collisions.tempCollPlacements = set([(100,100), (200,200), (300,300), (400,400), (500,500), (600,600), (700,700), (800,800), (900,900), (1000,1000), (200, 100), (300,100), (500,600), (100,400), (200, 600)])
+            curr_loc.collisions.tempCollPositions  = set()
+            curr_loc.collisions.generate()
             plt = SC.Plot()
-            plt.build(100, 100, bg, (WIDTH,HEIGHT), WIN)
-            plots.append(plt)
+            plt.build(100, 100, curr_loc.background, (WIDTH,HEIGHT), WIN)
+            curr_loc.plots.append(plt)
         
     if keys[pygame.K_m]:
         interactive_plot = []
-        interactive_plot = [player.checkTouching(coll, plots, pens)]
+        interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
         if isinstance(interactive_plot[0], SC.Pen):
             interactive_plot[0].milk(invt)
             
@@ -89,18 +97,18 @@ while run:
         if count - last_pressP >= 10:
             last_pressP = count
             pen = SC.Pen()
-            pen.build(100, 100, bg, (WIDTH,HEIGHT), WIN, rotation)
-            pens.append(pen)
+            pen.build(100, 100, curr_loc.background, (WIDTH,HEIGHT), WIN, rotation)
+            curr_loc.pens.append(pen)
     
     if keys[pygame.K_w]:
         interactive_plot = []
-        interactive_plot = [player.checkTouching(coll, plots, pens)]
+        interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
         if isinstance(interactive_plot[0], SC.Pen):
             interactive_plot[0].addAnimal("Lesser_Wyrm", str(count))
     
     if keys[pygame.K_c]:
         interactive_plot = []
-        interactive_plot = [player.checkTouching(coll, plots, pens)]
+        interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
         if isinstance(interactive_plot[0], SC.Pen):
             interactive_plot[0].addAnimal("Cow", str(count))
 
@@ -109,22 +117,22 @@ while run:
         if count - last_pressP >= 10:
              last_pressP = count
              interactive_plot = []
-             interactive_plot = [player.checkTouching(coll, plots, pens)]
+             interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
              if isinstance(interactive_plot[0], SC.Plot):
                  InvntF.inventoryPlant(invt, interactive_plot[0], invntindex, WIN, (WIDTH,HEIGHT))
              if isinstance(interactive_plot[0], SC.Pen):
                  InvntF.inventoryAnimal(invt, interactive_plot[0], invntindex, WIN, (WIDTH,HEIGHT))
                 
     if keys[pygame.K_h]:
-        interactive_plt = [player.checkTouching(coll, plots, pens)]
+        interactive_plt = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
         if isinstance(interactive_plt[0], SC.Plot):
             interactive_plt[0].harvest(invt)
     if keys[pygame.K_x]:
-        interactive = [player.checkTouching(coll, plots, pens)]
+        interactive = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
         if isinstance(interactive[0], C.Obstacle):
             interactive[0].health -= 10
             if interactive[0].health <= 0:
-                coll.removeFromCollision(interactive[0], invt)
+                curr_loc.collisions.removeFromCollision(interactive[0], invt)
     if keys[pygame.K_d]:
         if count - last_pressD >= 10:
             last_pressD = count
@@ -139,31 +147,26 @@ while run:
     if keys[pygame.K_g]:
          if count - last_pressG >= 10:
              last_pressG = count
-             for plt in plots:
+             for plt in curr_loc.plots:
                  plt.newDay()
-             for pn in pens:
+             for pn in curr_loc.pens:
                  pn.newDay()
                  
     if keys[pygame.K_b]:
         if count - last_pressP >= 10:
             last_pressP = count
-            InvntF.inventoryShop(invt, shop, invntindex, WIN, (WIDTH,HEIGHT), shop=True)
+            InvntF.inventoryShop(invt, curr_loc.shops[0], invntindex, WIN, (WIDTH,HEIGHT), shop=True)
     
     if not invnt_open:
-        player.controlPlayer((WIDTH, HEIGHT), keys, bg, coll, plots, pens)
-        WIN.fill((0,0,0))
-        bg.draw(WIN)
-        for i in plots:
-            i.draw(WIN, bg, (WIDTH,HEIGHT))
-        for i in pens:
-            i.draw(WIN, bg, (WIDTH,HEIGHT))
-            
+        player.controlPlayer((WIDTH, HEIGHT), keys, curr_loc.background, curr_loc.collisions, curr_loc.plots, curr_loc.pens)
+        
+        curr_loc.drawBeforePlayer(WIN, (WIDTH,HEIGHT))        
+
         player.draw(WIN)
         InvntF.displayInventory(WIN, invt)
-        coll.drawObstacles(bg, WIN, (WIDTH,HEIGHT), player)
-        #if len(pens) > 0:
-        #    if len(pens[0].animals) > 0:
-        #        WIN.blit(pens[0].animals[0].animal, (100,100))
+        
+        curr_loc.drawAfterPlayer(WIN, (WIDTH,HEIGHT), player)
+        
     else:
         if pygame.mouse.get_pressed()[0]:
             if count - last_mouse >= 10:
