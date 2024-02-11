@@ -10,11 +10,12 @@ NULL_ITEM = DF.getItem("Null_Item", 1)
 
 class Inventory:
         
-    def __init__(self, gold=None):
+    def __init__(self, use, gold=None):
         self.capacity = 30
         self.inventory = [NULL_ITEM] * self.capacity
         self.emptySpots = [i for i in range(self.capacity -1, -1, -1)]
         self.gold = gold
+        self.type = use
         
     
     def clearEmpty(self):
@@ -39,10 +40,12 @@ class Plot:
         self.numCrops = 0
         self.crops = []
         self.emptySpots = [i for i in range(self.capacity)]
-        self.plot = None
+        self.plot = GC.Plot()
+        self.width = 260
+        self.height = 260
         
-    def build(self, x, y, background, size, window):
-        self.plot = GC.Plot(x, y, background, size)
+    def build(self, x, y, background, size, window, rotation=None):
+        self.plot.build(x, y, background)
         #self.plot.draw(window, background, size)
         self.crops = [NULL_CROP] * self.capacity
         
@@ -68,8 +71,8 @@ class Plot:
                     invnt.clearEmpty()
                     return
                 
-    def draw(self, window, background, size, x=None, y=None):
-        if GCF.onScreen((self.plot.x, self.plot.y), (self.plot.width,self.plot.height), size):
+    def draw(self, window, background, size, x=None, y=None, rotation=None, bypass=False):
+        if bypass or GCF.onScreen((self.plot.x, self.plot.y), (self.plot.width,self.plot.height), size):
             self.plot.draw(window, background, size, x=x, y=y)
             if self.plot.cropNum == 0:
                 return
@@ -140,11 +143,11 @@ class Pen:
         self.animalStart = (x+20, y+20)
         
     
-    def draw(self, window, background: bg.Background, windowSize, x=None, y=None, rotation = None):
+    def draw(self, window, background: bg.Background, windowSize, x=None, y=None, rotation=None, bypass=False):
         # Animal size of 1 is 52x150
         # For size of i, image size is (52*i)+(20*(i-1))x150
             # doubles size and adds the 20 pixels in between
-        if GCF.onScreen((self.x, self.y), (self.width,self.height), windowSize):
+        if GCF.onScreen((self.x, self.y), (self.width,self.height), windowSize) or bypass:
             # either all three or none should be None
             if(x is None or y is None or rotation is None):
                 absCoords = (self.abs_x, self.abs_y)

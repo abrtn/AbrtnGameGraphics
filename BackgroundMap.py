@@ -2,8 +2,8 @@ import pygame
 import GraphicsClassFunctions as func
 
 LOCATIONS = {
-    "Test" : ["Art\Field.png", 12000, 7500]
-    
+    "Test" : ["Art\Field.png", 12000, 7500],
+    "mapTest" : ["Art\mapTest.png", 2560, 1279]
     }
 
 class Background:

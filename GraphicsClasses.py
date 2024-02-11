@@ -21,7 +21,7 @@ class Player:
         self.animated = animated
         
     def stepAnimation(self):
-        player = pygame.image.load(self.images[self.animationIndex])
+        player = pygame.image.load(self.images[self.animationIndex],)
         player = pygame.transform.scale(player, (self.width,self.height))
         self.animationIndex += 1
         self.animationIndex %= len(self.images)
@@ -36,85 +36,83 @@ class Player:
             self.y = y
         if(self.animated and moving):
             self.stepAnimation
-        
         window.blit(self.player, (x,y))
         
-    def controlPlayer(self, window_size, keys, background: bg.Background, coll, plots, pens):
+    def controlPlayer(self, window_size, keys, loc):
         if keys[pygame.K_LEFT]:
-            collision = coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
+            collision = loc.collisions.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
-            if self.x <= 100 and background.x < 0:
-                background.x += self.speed
+            if self.x <= 100 and loc.background.x < 0:
+                loc.background.x += self.speed
                 self.absx -= self.speed
             elif self.x > 0:
                 self.x -= self.speed
                 self.absx -= self.speed
         if keys[pygame.K_RIGHT]:
-            collision = coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
+            collision = loc.collisions.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
-            if self.x + self.width >= window_size[0] - 100 and background.x > window_size[0] - background.locationData[1]:
-                background.x -= self.speed
+            if self.x + self.width >= window_size[0] - 100 and loc.background.x > window_size[0] - loc.background.locationData[1]:
+                loc.background.x -= self.speed
                 self.absx += self.speed
             elif self.x + self.width < window_size[0]:
                 self.x += self.speed
                 self.absx += self.speed
         if keys[pygame.K_UP]:
-            collision =  coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots, pens)
+            collision =  loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
-            if self.y <= 100 and background.y < 0:
-                background.y += self.speed
+            if self.y <= 100 and loc.background.y < 0:
+                loc.background.y += self.speed
                 self.absy -= self.speed
             elif self.y > 0:
                 self.y -= self.speed
                 self.absy -= self.speed
         if keys[pygame.K_DOWN]:
-            collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots, pens)
+            collision = loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
                 return
-            if self.y + self.height >= window_size[1] - 100 and background.y > window_size[1] - background.locationData[2]:
-                background.y -= self.speed
+            if self.y + self.height >= window_size[1] - 100 and loc.background.y > window_size[1] - loc.background.locationData[2]:
+                loc.background.y -= self.speed
                 self.absy += self.speed
             elif self.y + self.height < window_size[1]:
                 self.y += self.speed
                 self.absy += self.speed
                 
-    def checkTouching(self, coll, plots, pens):
-        collision = coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
+    def checkTouching(self, loc):
+        collision = loc.collisions.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
         if collision is not None:
-            return coll.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
-        collision = coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
+            return loc.collisions.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
+        collision = loc.collisions.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
         if collision is not None:
-            return coll.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', plots, pens)
-        collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots, pens)
+            return loc.collisions.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
+        collision = loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', loc)
         if collision is not None:
-            return coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', plots, pens)
-        collision = coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots, pens)
+            return loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', loc)
+        collision = loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', loc)
         if collision is not None:
-            return coll.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', plots, pens)
+            return loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', loc)
         return None
 
 class Plot:
-    def __init__(self, x, y, background: bg.Background, windowSize):
-        self.x = x
-        self.y = y
-        self.abs_x = x + (0-background.x)
-        self.abs_y = y + (0-background.y)
+    def __init__(self):
+        self.x = None
+        self.y = None
+        self.abs_x = None
+        self.abs_y = None
         #self.location = background.locationData
         self.width = 260
         self.height = 260
         self.image = "Art/Plot.png"
         self.crops = [None] * 25
         self.cropNum = 0
-        self.cropStart = [self.x + 35, self.y + 30]
+        self.cropStart = None
         self.step = 35
-        self.next_empty = 24
         self.cropPos = [(4,4),(3,4),(2,4),(1,4),(0,4),
                         (4,3),(3,3),(2,3),(1,3),(0,3),
                         (4,2),(3,2),(2,2),(1,2),(0,2),
@@ -124,6 +122,13 @@ class Plot:
         plot = pygame.image.load(self.image)
         plot = pygame.transform.scale(plot, (self.width,self.height))
         self.plot = plot
+        
+    def build(self, x, y, background: bg.Background):
+        self.x = x
+        self.y = y
+        self.abs_x = x + (0-background.x)
+        self.abs_y = y + (0-background.y)
+        self.cropStart = [self.x + 35, self.y + 30]
         
     def draw(self, window, background: bg.Background, windowSize, x=None, y=None):
         if(x is None or y is None):
@@ -144,34 +149,6 @@ class Plot:
         self.y = coords[1]
         self.cropStart = [self.x + 35, self.y + 30]
         
-
-class Pen:
-    def __init__(self, x, y, background: bg.Background, windowSize):
-        self.x = x
-        self.y = y
-        self.abs_x = x + (0-background.x)
-        self.abs_y = y + (0-background.y)
-        self.location = background.locationData
-        self.width = 260
-        self.height = 260
-        self.image = "Art/Pen.png"
-        pen = pygame.image.load(self.image)
-        pen = pygame.transform.scale(pen, (self.width,self.height))
-        self.pen = pen
-    
-    def draw(self, window, background: bg.Background, windowSize, x=None, y=None):
-        if(x is None or y is None):
-            absCoords = (self.abs_x, self.abs_y)
-            coords = GCF.absToRelCoords(absCoords, background, windowSize)
-        self.x = coords[0]
-        self.y = coords[1]
-        window.blit(self.plot, coords)
-        
-    def updateRelCoords(self, window, background: bg.Background, windowSize):
-        absCoords = (self.abs_x, self.abs_y)
-        coords = GCF.absToRelCoords(absCoords, background, windowSize)
-        self.x = coords[0]
-        self.y = coords[1]
 
 
 class Crop:
@@ -206,18 +183,47 @@ class Crop:
         crop = pygame.image.load(self.images[self.imageIndex + 1])
         crop = pygame.transform.scale(crop, (self.width,self.height))
         self.crop = crop
-        
-        
 
-class Animal:
-    def __init__(self, name):
+
+class Building:
+    def __init__(self, name, x, y):
         self.name = name
-        self.width = 20
-        self.height = 20
-        self.images = GCF.getImage(name)
-        self.imageIndex = 0
-        anm = pygame.image.load(self.images[1])
-        anm = pygame.transform.scale(anm, (self.width,self.height))
-        self.anm = anm
-        self.loc = [-100, -100]
-        self.anmNumInPen = 0
+        self.absx = x
+        self.absy = y
+        image = GCF.getImage(name)
+        self.image = pygame.image.load(image[1])
+        self.width = int(image[2])
+        self.height = int(image[3])
+        self.entrance = image[4].split(',')     # form [xedge1, xedge2, yedge1, yedge2], where each value is 0<width/height
+
+    def draw(self, window, background: bg.Background, windowSize, x=None, y=None):
+        if(x is None or y is None):
+            absCoords = (self.absx, self.absy)
+            coords = GCF.absToRelCoords(absCoords, background, windowSize)
+            self.x = coords[0]
+            self.y = coords[1]
+        else:
+            coords = [x, y]
+        window.blit(self.image, coords)
+
+    def checkColl(self, newX, newY, direction):
+        # needs to take in abs coords
+        if direction == 'X' or direction == 'x':
+            if newX == self.absx or newX == self.absx + self.width:
+                for y in newY:
+                    if y >= self.absy and y <= self.absy + self.height:
+                        return True
+        else:
+            if newY == self.absy or newY == self.absy + self.height:
+                for x in newX:
+                    if x >= self.absx and x <= self.absx + self.width:
+                        return True
+        return False
+
+    def checkEntrance(self, newX, newY):
+        for i in newX:
+            if i >= self.absx + int(self.entrance[0]) and i <= self.absx + int(self.entrance[1]):
+                for j in newY:
+                    if j >= self.absy + int(self.entrance[2]) and j <= self.absy + int(self.entrance[3]):
+                        return True
+        return False

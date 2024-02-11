@@ -18,3 +18,6 @@ Carrot					Art\Carrot.png
 Carrot_Seed				Art\Carrot_Seed.png
 Evil_Carrot				Art\EvilCarrot.png
 Holy_Carrot				Art\HolyCarrot.png
+_
+_ Building				Art						Width					Height						Entrance(xedge1, xedge2, yedge1, yedge2)
+Shop					Art\Shop.png			260						260							30,250,260,260

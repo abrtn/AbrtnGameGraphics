@@ -272,7 +272,6 @@ def getPenAnimal(pen, mousePos):
 
 def displayAnimal(animal: OC.Animal, window, x, y):                         # TODO display item ready and alignment?
     spacing = 150
-    print(animal.alignment)
     pygame.font.init()
     textFont = pygame.font.SysFont('Times New Roman', 20)
     # draw animal

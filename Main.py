@@ -1,3 +1,4 @@
+from re import A
 import pygame
 
 import GraphicsClasses as GC
@@ -12,6 +13,11 @@ import Locations as L
 ###########################################################
 ###########################################################
 # NEXT TODO: Alignments, select box for items, fertilizer #
+# Fix placing plots, pens inside others                   #
+# Obstacles generating inside plots, pens, buildings      #
+# Finalize shops                                          #
+# Obstacles generated based on location                   #
+# Buying animals, buying pens/plots                       #
 ###########################################################
 ###########################################################
 # Add in dictionaries
@@ -33,12 +39,11 @@ count = 0
 player = GC.Player(0,0,80,80)
 bg = BGM.Background("Test", 0, 0)
 
-locations = {"Field" : L.Location()}
-curr_loc = locations["Field"]
-
-# TODO Initialize location background, shops, collisions in separate file/function
-curr_loc.background = BGM.Background("Test", 0, 0)
-curr_loc.shops.append(SC.Inventory())
+locations = {"Field" : L.Location("Field"),
+             "Shop" : L.Location("Shop")}
+curr_loc = locations["Shop"]
+curr_loc.shops.append(SC.Inventory("Shop"))
+curr_loc.background = BGM.Background("mapTest", 0, 0)
 curr_loc.shops[0].addToInvnt(DF.getItem("Turnip_Seed", 50))
 curr_loc.shops[0].addToInvnt(DF.getItem("Carrot_Seed", 50))
 curr_loc.shops[0].addToInvnt(DF.getItem("Turnip", 50))
@@ -46,15 +51,26 @@ curr_loc.shops[0].addToInvnt(DF.getItem("Carrot", 50))
 curr_loc.shops[0].addToInvnt(DF.getItem("Evil_Carrot", 50))
 curr_loc.shops[0].addToInvnt(DF.getItem("Holy_Carrot", 50))
 curr_loc.collisions = C.Collision()
+curr_loc = locations["Field"]
 
-invt = SC.Inventory(50)
+placableLocs = ["Shop"]
+
+# TODO Initialize location background, shops, collisions in separate file/function
+curr_loc.background = BGM.Background("Test", 0, 0)
+
+curr_loc.collisions = C.Collision()
+
+shop = GC.Building("Shop", 100, 500)
+curr_loc.buildings.append(shop)
+
+invt = SC.Inventory("Player", 50)
 invnt_open = False
 check = False
 pygame.mouse.set_visible(False)
 invntindex = 0
 rotation = 0
-chest = SC.Inventory()
-
+chest = SC.Inventory("Storage")
+pen = None
 while run:
     clock.tick(20)
     count += 1
@@ -62,24 +78,28 @@ while run:
             if event.type == pygame.QUIT:
                 run = False
                 break
-                
-                
+                          
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_s]:
-        if count - last_pressP >= 10:
-            last_pressP = count
-            curr_loc.collisions.obsList = [None] * 10
-            curr_loc.collisions.tempCollPlacements = set([(100,100), (200,200), (300,300), (400,400), (500,500), (600,600), (700,700), (800,800), (900,900), (1000,1000), (200, 100), (300,100), (500,600), (100,400), (200, 600)])
-            curr_loc.collisions.tempCollPositions  = set()
-            curr_loc.collisions.generate()
-            plt = SC.Plot()
-            plt.build(100, 100, curr_loc.background, (WIDTH,HEIGHT), WIN)
-            curr_loc.plots.append(plt)
+        if curr_loc.name in placableLocs:
+            if count - last_pressP >= 10:
+                last_pressP = count
+                plt = SC.Plot()
+                if GCF.placePenPlot(plt, (260,260), WIN, (WIDTH,HEIGHT), locations["Field"]):
+                    locations["Field"].plots.append(plt)
+            
+    if keys[pygame.K_q]:
+        if curr_loc.name == "Field":
+            if count - last_pressP >= 10:        
+                curr_loc.collisions.obsList = [None] * 10
+                curr_loc.collisions.tempCollPlacements = set([(100,100), (200,200), (300,300), (400,400), (500,500), (600,600), (700,700), (800,800), (900,900), (1000,1000), (200, 100), (300,100), (500,600), (100,400), (200, 600)])
+                curr_loc.collisions.tempCollPositions  = set()
+                curr_loc.collisions.generate()
         
     if keys[pygame.K_m]:
         interactive_plot = []
-        interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
+        interactive_plot = [player.checkTouching(curr_loc)]
         if isinstance(interactive_plot[0], SC.Pen):
             interactive_plot[0].milk(invt)
             
@@ -94,41 +114,51 @@ while run:
             InvntF.inventoryShop(invt, chest, invntindex, WIN, (WIDTH,HEIGHT))
 
     if keys[pygame.K_a]:
-        if count - last_pressP >= 10:
-            last_pressP = count
-            pen = SC.Pen()
-            pen.build(100, 100, curr_loc.background, (WIDTH,HEIGHT), WIN, rotation)
-            curr_loc.pens.append(pen)
-    
+        if curr_loc.name in placableLocs:
+            if count - last_pressP >= 10:
+                last_pressP = count
+                pen = SC.Pen()
+                if GCF.placePenPlot(pen, (260,260), WIN, (WIDTH,HEIGHT), locations["Field"]):
+                    locations["Field"].pens.append(pen)
+               
     if keys[pygame.K_w]:
         interactive_plot = []
-        interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
+        interactive_plot = [player.checkTouching(curr_loc)]
         if isinstance(interactive_plot[0], SC.Pen):
             interactive_plot[0].addAnimal("Lesser_Wyrm", str(count))
     
     if keys[pygame.K_c]:
         interactive_plot = []
-        interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
+        interactive_plot = [player.checkTouching(curr_loc)]
         if isinstance(interactive_plot[0], SC.Pen):
             interactive_plot[0].addAnimal("Cow", str(count))
 
     if keys[pygame.K_p]:
-        check = True
+        #check = True
         if count - last_pressP >= 10:
-             last_pressP = count
-             interactive_plot = []
-             interactive_plot = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
-             if isinstance(interactive_plot[0], SC.Plot):
+            last_pressP = count
+            if curr_loc.name == "Shop":
+                # exit shop
+                curr_loc = L.swapLoc(curr_loc, locations["Field"], player, (WIDTH,HEIGHT))
+                continue
+            interactive_plot = []
+            interactive_plot = [player.checkTouching(curr_loc)]
+            if isinstance(interactive_plot[0], SC.Plot):
                  InvntF.inventoryPlant(invt, interactive_plot[0], invntindex, WIN, (WIDTH,HEIGHT))
-             if isinstance(interactive_plot[0], SC.Pen):
+            if isinstance(interactive_plot[0], SC.Pen):
                  InvntF.inventoryAnimal(invt, interactive_plot[0], invntindex, WIN, (WIDTH,HEIGHT))
+            if isinstance(interactive_plot[0], GC.Building):
+                if interactive_plot[0].checkEntrance((player.absx, player.absx+player.width), (player.absy, player.absy+player.height)):
+                    # enter shop 
+                     print("Enter")
+                     curr_loc = L.swapLoc(curr_loc, locations["Shop"], player, (WIDTH,HEIGHT))
                 
     if keys[pygame.K_h]:
-        interactive_plt = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
+        interactive_plt = [player.checkTouching(curr_loc)]
         if isinstance(interactive_plt[0], SC.Plot):
             interactive_plt[0].harvest(invt)
     if keys[pygame.K_x]:
-        interactive = [player.checkTouching(curr_loc.collisions, curr_loc.plots, curr_loc.pens)]
+        interactive = [player.checkTouching(curr_loc)]
         if isinstance(interactive[0], C.Obstacle):
             interactive[0].health -= 10
             if interactive[0].health <= 0:
@@ -153,12 +183,13 @@ while run:
                  pn.newDay()
                  
     if keys[pygame.K_b]:
-        if count - last_pressP >= 10:
-            last_pressP = count
-            InvntF.inventoryShop(invt, curr_loc.shops[0], invntindex, WIN, (WIDTH,HEIGHT), shop=True)
+        if curr_loc.name == "Shop":
+            if count - last_pressP >= 10:
+                last_pressP = count
+                InvntF.inventoryShop(invt, curr_loc.shops[0], invntindex, WIN, (WIDTH,HEIGHT), shop=True)
     
     if not invnt_open:
-        player.controlPlayer((WIDTH, HEIGHT), keys, curr_loc.background, curr_loc.collisions, curr_loc.plots, curr_loc.pens)
+        player.controlPlayer((WIDTH, HEIGHT), keys, curr_loc)
         
         curr_loc.drawBeforePlayer(WIN, (WIDTH,HEIGHT))        
 

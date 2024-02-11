@@ -29,7 +29,7 @@ class Collision:
         self.canopy = {}
 
     #When called, x and y coords need to be edge of player, not player x and y
-    def checkColl(self, newX, newY, direction, plots, pens):
+    def checkColl(self, newX, newY, direction, loc):
         # Check with permanent collision boxes
                                     # TODO check with list of coords
         #print(len(self.onScreenTempColl))
@@ -49,17 +49,21 @@ class Collision:
             if i.checkColl(newX, newY, direction):
                 return i
         
-        for j in plots:
+        for j in loc.plots:
             if j.checkColl(newX, newY, direction):
                 return j
         
-        for i in pens:
+        for i in loc.pens:
+            if i.checkColl(newX, newY, direction):
+                return i
+
+        for i in loc.buildings:
             if i.checkColl(newX, newY, direction):
                 return i
         return None
 
 
-    def generate(self):
+    def generate(self):                     # TODO take in location and change generated obs based on loc
         for i in range(len(self.obsList)):
             if self.obsList[i] is None:
                 self.obsList[i] = Obstacle()
@@ -89,19 +93,23 @@ class Collision:
                     self.onScreenTempColl.append(i)
         transp = []
         canopy = set()
-        for i in canopies:
-            if GCF.checkInside(i, 300, 300, (player.x,player.y), player.width, player.height):
-                transp.append(i)
-            else:
-                canopy.add(i)
-        for i in transp:
-            window.blit(Collision.canopyTransp, i)
-            for j in list(canopy):
-                if GCF.checkInside(j, 300, 300, i, 300, 300):
-                    transp.append(j)
-                    canopy.remove(j)
-        for i in canopy:
-            window.blit(Collision.canopy, i)
+        if player is not None:
+            for i in canopies:
+                if GCF.checkInside(i, 300, 300, (player.x,player.y), player.width, player.height):
+                    transp.append(i)
+                else:
+                    canopy.add(i)
+            for i in transp:
+                window.blit(Collision.canopyTransp, i)
+                for j in list(canopy):
+                    if GCF.checkInside(j, 300, 300, i, 300, 300):
+                        transp.append(j)
+                        canopy.remove(j)
+            for i in canopy:
+                window.blit(Collision.canopy, i)
+        else:
+            for i in canopies:
+                window.blit(Collision.canopyTransp, i)
 
 
 class Obstacle:
