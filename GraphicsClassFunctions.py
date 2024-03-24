@@ -128,7 +128,7 @@ def placePenPlot(item, size, WIN, winSize, loc):
         WIN.fill((0,0,0))
         loc.drawBeforePlayer(WIN, winSize)
         loc.drawAfterPlayer(WIN, winSize, None)
-        item.draw(WIN, loc.background, winSize, x=coords[0]-100, y=coords[1]-100, rotation=rotation, bypass=True)         #window, background, size, x, y, rotation
+        item.draw(WIN, loc.background, winSize, x=coords[0] - 100, y=coords[1] - 100, rotation=rotation, bypass=True)         #window, background, size, x, y, rotation
         pygame.display.update()
     return False
         

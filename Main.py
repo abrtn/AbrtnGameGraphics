@@ -1,4 +1,3 @@
-from re import A
 import pygame
 
 import GraphicsClasses as GC
@@ -70,7 +69,10 @@ pygame.mouse.set_visible(False)
 invntindex = 0
 rotation = 0
 chest = SC.Inventory("Storage")
-pen = None
+
+ledAnimal = None
+animalDirections = []
+
 while run:
     clock.tick(20)
     count += 1
@@ -122,16 +124,31 @@ while run:
                     locations["Field"].pens.append(pen)
                
     if keys[pygame.K_w]:
-        interactive_plot = []
-        interactive_plot = [player.checkTouching(curr_loc)]
-        if isinstance(interactive_plot[0], SC.Pen):
-            interactive_plot[0].addAnimal("Lesser_Wyrm", str(count))
+        ledAnimal = DF.getAnimal("Lesser_Wyrm", str(count))
+        ledAnimal.x = player.x - 100
+        ledAnimal.y = player.y - 130
+        animalDirections = []
+        #interactive_plot = []
+        #interactive_plot = [player.checkTouching(curr_loc)]
+        #if isinstance(interactive_plot[0], SC.Pen):
+        #    interactive_plot[0].addAnimal("Lesser_Wyrm", str(count))
     
     if keys[pygame.K_c]:
+        ledAnimal = DF.getAnimal("Cow", str(count))
+        ledAnimal.x = player.x + 30
+        ledAnimal.y = player.y - 130
+        animalDirections = []
+        #interactive_plot = []
+        #interactive_plot = [player.checkTouching(curr_loc)]
+        #if isinstance(interactive_plot[0], SC.Pen):
+        #    interactive_plot[0].addAnimal("Cow", str(count))
+        
+    if keys[pygame.K_y]:
         interactive_plot = []
         interactive_plot = [player.checkTouching(curr_loc)]
-        if isinstance(interactive_plot[0], SC.Pen):
-            interactive_plot[0].addAnimal("Cow", str(count))
+        if isinstance(interactive_plot[0], SC.Pen) and ledAnimal is not None:
+            interactive_plot[0].addAnimal(ledAnimal.species, ledAnimal.name)
+            ledAnimal = None
 
     if keys[pygame.K_p]:
         #check = True
@@ -189,11 +206,18 @@ while run:
                 InvntF.inventoryShop(invt, curr_loc.shops[0], invntindex, WIN, (WIDTH,HEIGHT), shop=True)
     
     if not invnt_open:
-        player.controlPlayer((WIDTH, HEIGHT), keys, curr_loc)
+        move = player.controlPlayer((WIDTH, HEIGHT), keys, curr_loc)
         
         curr_loc.drawBeforePlayer(WIN, (WIDTH,HEIGHT))        
 
         player.draw(WIN)
+        if ledAnimal is not None:
+            animalDirections.append(move)
+            if len(animalDirections) > 5:
+                ledAnimal.walk(WIN, animalDirections[0], player)
+                animalDirections.pop(0)
+            else:
+                ledAnimal.walk(WIN, "", player)
         InvntF.displayInventory(WIN, invt)
         
         curr_loc.drawAfterPlayer(WIN, (WIDTH,HEIGHT), player)

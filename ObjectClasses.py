@@ -1,3 +1,4 @@
+import math
 import pygame
 import GraphicsClasses as GC
 import DataFunctions as DF
@@ -98,6 +99,10 @@ class Animal:
         self.alignment = "Neutral"
         self.dataIndex = 0
         self.animal = pygame.image.load(self.images[self.imageIndex])
+        # walk params
+        self.x = None
+        self.y = None
+        self.lastRot = 0
         
     def advanceDay(self):
         if not self.grown:
@@ -159,6 +164,121 @@ class Animal:
 
         animal = pygame.transform.rotate(self.animal, rotation * -90)
         WIN.blit(animal, coords)
+        
+    def walk(self, WIN, nextMove, player):                # TODO fix when 3+ keys are pressed
+        # Needs to:
+            # Follow player motions X
+            # Rotate to face correct direction X
+            # Be always behind player X
+            # Start on player and let player move first X
+            # Turn as a pivot on midpoint of animal X
+            # Arc to center of player
+            # Collide with player
+        animalWidth = (52*self.size)+(20*(self.size-1))
+        if nextMove == "":
+            rotation = self.lastRot
+        else:
+            rotation = 0
+
+        for c in nextMove:
+            if c == "R" or c == "r":
+                
+                rotation -= 1
+            elif c == "L" or c == "l":
+               
+                rotation += 1
+            elif c == "U" or c == "u":
+                
+                rotation += 2
+            elif c == "D" or c == "d":
+                
+                rotation += 0
+        if len(nextMove) != 0:
+            rotation /= len(nextMove)
+        if nextMove.upper() == "RU" or nextMove.upper() == "UR":
+            rotation = 2.5
+
+        if self.lastRot != rotation:
+            if  rotation % 1 == 0 and self.lastRot % 1 == 0:      # rotate animal around midpoint horizontal <-> vertical
+                if rotation % 2 == 0 and self.lastRot % 2 != 0:
+                    self.x += (150/2) - (animalWidth/2)
+                    self.y += (-(150/2) + (animalWidth/2))
+                elif rotation % 2 != 0 and self.lastRot % 2 != 1:
+                    self.x += (animalWidth/2) - (150/2)
+                    self.y += (-(animalWidth/2) + (150/2))
+                
+            elif self.lastRot % 1 != 0 and rotation % 1 == 0:     # rotate animal around midpoint from diagonal
+                if rotation % 2 == 1:       # to horizontal
+                    self.x += (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.cos(math.pi/4) - (150/2)
+                    self.y += (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.sin(math.pi/4) - (animalWidth/2)
+                elif rotation % 2 == 0:     # to vertical
+                    self.x += (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.cos(math.pi/4) - (animalWidth/2)
+                    self.y += (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.sin(math.pi/4) - (150/2)
+                
+            elif rotation % 1 != 0 and self.lastRot % 1 == 0:         # rotate animal around midpoint to diagonal
+                if self.lastRot % 2 == 1:   # from horizontal
+                    self.x -= (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.cos(math.pi/4) - (150/2)
+                    self.y -= (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.sin(math.pi/4) - (animalWidth/2)
+                if self.lastRot % 2 == 0:   # from vertical
+                    self.x -= (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.cos(math.pi/4) - (animalWidth/2)
+                    self.y -= (1/2)*(animalWidth*math.tan(math.pi/4) + 150)*math.sin(math.pi/4) - (150/2)
+
+        self.lastRot = rotation
+
+        for c in nextMove:
+            if c == "R" or c == "r":
+                #print(str(player.x) + ", " + str(player.y) + ", " + str(player.x+player.width) + ", " + str(player.y+player.height))
+                #print(str(self.x) + ", " + str(self.y) + ", " + str(self.x+animalWidth) + ", " + str(self.y+150))
+                if self.x < player.x - 180: # length of animal + buffer of 30 = 180
+                    if c.isupper():
+                        self.x += 20
+                    if len(nextMove) == 1:
+                        if self.y < player.y:       # gradually move towards player along y axis
+                            self.y += 10
+                        elif self.y > player.y + player.height - animalWidth:
+                            print("Below")
+                            self.y -= 10
+            elif c == "L" or c == "l":
+                #print(str(player.x) + ", " + str(player.y) + ", " + str(player.x+player.width) + ", " + str(player.y+player.height))
+                #print(str(self.x) + ", " + str(self.y) + ", " + str(self.x+animalWidth) + ", " + str(self.y+150))
+                if self.x > player.x + player.width + 30:   # x value of player + player width + buffer of 30
+                    if c.isupper():
+                        self.x -= 20
+                    if len(nextMove) == 1:
+                        if self.y < player.y:       # gradually move towards player along y axis
+                            self.y += 10
+                            print("Above")
+                        elif self.y > player.y + player.height - animalWidth:
+                            self.y -= 10
+            elif c == "U" or c == "u":
+                #print(str(player.x) + ", " + str(player.y) + ", " + str(player.x+player.width) + ", " + str(player.y+player.height))
+                #print(str(self.x) + ", " + str(self.y) + ", " + str(self.x+animalWidth) + ", " + str(self.y+150))
+                if self.y > player.y + player.height + 30:  # y value of bottom of player + buffer of 30
+                    if c.isupper():
+                        self.y -= 20
+                    if len(nextMove) == 1:
+                        if self.x < player.x:       # gradually move towards player along x axis
+                            print("To left")
+                            self.x += 10
+                        elif self.x > player.x + player.width - animalWidth:
+                            print("To right")
+                            self.x -= 10
+            elif c == "D" or c == "d":
+                #print(str(player.x) + ", " + str(player.y) + ", " + str(player.x+player.width) + ", " + str(player.y+player.height))
+                #print(str(self.x) + ", " + str(self.y) + ", " + str(self.x+animalWidth) + ", " + str(self.y+150))
+                if self.y < player.y - 180: # y value of top of player
+                    if c.isupper():
+                        self.y += 20
+                    if len(nextMove) == 1:
+                        if self.x < player.x:       # gradually move towards player along x axis
+                            print("To left")
+                            self.x += 10
+                        elif self.x > player.x + player.width - animalWidth:
+                            print("To right")
+                            self.x -= 10
+        
+        animal = pygame.transform.rotate(self.animal, rotation * -90)
+        WIN.blit(animal, (self.x, self.y))
     
     def feed(self, item: Item):
         print("_" + item.alignment)

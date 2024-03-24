@@ -39,50 +39,65 @@ class Player:
         window.blit(self.player, (x,y))
         
     def controlPlayer(self, window_size, keys, loc):
+        outStr = ""
         if keys[pygame.K_LEFT]:
             collision = loc.collisions.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
-                return
+                return outStr
             if self.x <= 100 and loc.background.x < 0:
                 loc.background.x += self.speed
                 self.absx -= self.speed
+                outStr += "l"           # lowercase if player is hitting a wall. Keeps calculation for animal rotation
             elif self.x > 0:
                 self.x -= self.speed
                 self.absx -= self.speed
+                outStr += "L"           # uppercase if player is not hitting a wall. Moves animal location and calculates rotation
+            
         if keys[pygame.K_RIGHT]:
             collision = loc.collisions.checkColl(self.absx + self.width, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
-                return
+                return outStr
             if self.x + self.width >= window_size[0] - 100 and loc.background.x > window_size[0] - loc.background.locationData[1]:
                 loc.background.x -= self.speed
                 self.absx += self.speed
+                outStr += "r"
             elif self.x + self.width < window_size[0]:
                 self.x += self.speed
                 self.absx += self.speed
+                outStr += "R"
+            
         if keys[pygame.K_UP]:
             collision =  loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy,'Y', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
-                return
+                return outStr
             if self.y <= 100 and loc.background.y < 0:
                 loc.background.y += self.speed
                 self.absy -= self.speed
+                outStr += "u"
             elif self.y > 0:
                 self.y -= self.speed
                 self.absy -= self.speed
+                outStr += "U"
+            
         if keys[pygame.K_DOWN]:
             collision = loc.collisions.checkColl([*range(self.absx+10, self.absx+self.width, 20)], self.absy + self.height,'Y', loc)
             if collision is not None:
                 #print("Collision: " + collision[1])
-                return
+                return outStr
             if self.y + self.height >= window_size[1] - 100 and loc.background.y > window_size[1] - loc.background.locationData[2]:
                 loc.background.y -= self.speed
                 self.absy += self.speed
+                outStr += "d"
             elif self.y + self.height < window_size[1]:
                 self.y += self.speed
                 self.absy += self.speed
+                outStr += "D"
+            
+        return outStr
+            
                 
     def checkTouching(self, loc):
         collision = loc.collisions.checkColl(self.absx, [*range(self.absy+10, self.absy+self.height, 20)],'X', loc)
